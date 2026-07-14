@@ -9,8 +9,8 @@ export function generateOTP(): string {
 export async function sendOTPEmail(email: string, otp: string, type: string = 'Verification'): Promise<boolean> {
   try {
     const subject = type === 'Password Reset' 
-      ? 'Reset Your Binance Work Password' 
-      : 'Your Binance Work OTP Code';
+      ? 'Reset Your CryptoVoice Password' 
+      : 'Your CryptoVoice OTP Code';
     
     const message = type === 'Password Reset'
       ? 'Your password reset code is:'
@@ -27,7 +27,7 @@ export async function sendOTPEmail(email: string, otp: string, type: string = 'V
       html: `
         <div style="font-family: Arial, sans-serif; padding: 20px; background-color: #f9f9f9;">
           <div style="max-width: 500px; margin: 0 auto; background-color: white; border-radius: 8px; padding: 30px;">
-            <h2 style="color: #1f2937; margin-bottom: 20px;">Binance Work</h2>
+            <h2 style="color: #1f2937; margin-bottom: 20px;">CryptoVoice</h2>
             <p style="color: #666; font-size: 14px; margin-bottom: 20px;">
               ${type === 'Password Reset' ? 'Password Reset Request' : 'Email Verification'}
             </p>

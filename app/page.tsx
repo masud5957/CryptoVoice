@@ -48,7 +48,7 @@ export default function Page() {
       {/* Header */}
       <div className="bg-white border-b sticky top-0 z-40">
         <div className="max-w-md mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-amber-600">Binance Work</h1>
+          <h1 className="text-2xl font-bold text-amber-600">CryptoVoice</h1>
           {isAuthenticated && (
             <button
               onClick={() => {
