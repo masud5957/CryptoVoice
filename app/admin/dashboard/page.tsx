@@ -21,11 +21,14 @@ interface Withdrawal {
 
 export default function AdminDashboard() {
   const router = useRouter();
-  const [tab, setTab] = useState<'withdrawals' | 'balance'>('withdrawals');
+  const [tab, setTab] = useState<'users' | 'withdrawals' | 'balance'>('users');
   const [users, setUsers] = useState<User[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+  const [searchEmail, setSearchEmail] = useState('');
   const [withdrawals, setWithdrawals] = useState<Withdrawal[]>([]);
   const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState('');
+  const [userEmail, setUserEmail] = useState('');
   const [amount, setAmount] = useState('');
   const [reason, setReason] = useState('');
   const [message, setMessage] = useState('');
@@ -35,16 +38,44 @@ export default function AdminDashboard() {
   }, []);
 
   useEffect(() => {
-    if (tab === 'withdrawals') {
+    if (tab === 'users') {
+      fetchAllUsers();
+    } else if (tab === 'withdrawals') {
       fetchPendingWithdrawals();
     }
   }, [tab]);
+
+  useEffect(() => {
+    const filtered = searchEmail.trim()
+      ? users.filter(u => u.email.toLowerCase().includes(searchEmail.toLowerCase()))
+      : users;
+    setFilteredUsers(filtered);
+  }, [searchEmail, users]);
 
   const checkAuth = async () => {
     const token = localStorage.getItem('adminToken');
     if (!token) {
       router.push('/admin/login');
       return;
+    }
+  };
+
+  const fetchAllUsers = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('adminToken');
+      const response = await fetch('/api/admin/users/list', {
+        headers: { 'X-Admin-Token': token || '' },
+      });
+      const data = await response.json();
+      if (data.success) {
+        setUsers(data.users);
+        setFilteredUsers(data.users);
+      }
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -153,7 +184,17 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        <div className="flex gap-4 mb-8">
+        <div className="flex gap-4 mb-8 flex-wrap">
+          <button
+            onClick={() => setTab('users')}
+            className={`px-6 py-2 rounded-lg font-medium transition-colors ${
+              tab === 'users'
+                ? 'bg-blue-600 text-white'
+                : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+            }`}
+          >
+            All Users
+          </button>
           <button
             onClick={() => setTab('withdrawals')}
             className={`px-6 py-2 rounded-lg font-medium transition-colors ${
@@ -175,6 +216,63 @@ export default function AdminDashboard() {
             Add Balance
           </button>
         </div>
+
+        {tab === 'users' && (
+          <div className="bg-white rounded-lg border border-gray-200">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-semibold text-gray-900">All Users</h2>
+                <input
+                  type="text"
+                  placeholder="Search by email..."
+                  value={searchEmail}
+                  onChange={(e) => setSearchEmail(e.target.value)}
+                  className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent w-64"
+                />
+              </div>
+
+              {loading ? (
+                <p className="text-gray-500">Loading...</p>
+              ) : filteredUsers.length === 0 ? (
+                <p className="text-gray-500">No users found</p>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-gray-50 border-b">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">User ID</th>
+                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Email</th>
+                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Balance</th>
+                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y">
+                      {filteredUsers.map((user) => (
+                        <tr key={user.id} className="hover:bg-gray-50">
+                          <td className="px-4 py-3 text-sm font-medium text-gray-900">{user.id}</td>
+                          <td className="px-4 py-3 text-sm text-gray-600">{user.email}</td>
+                          <td className="px-4 py-3 text-sm font-medium text-gray-900">${user.balance.toFixed(2)} USDT</td>
+                          <td className="px-4 py-3 text-sm">
+                            <button
+                              onClick={() => {
+                                setUserId(user.id.toString());
+                                setUserEmail(user.email);
+                                setTab('balance');
+                              }}
+                              className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-xs font-medium"
+                            >
+                              Add Balance
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {tab === 'withdrawals' && (
           <div className="bg-white rounded-lg border border-gray-200">
@@ -229,36 +327,65 @@ export default function AdminDashboard() {
               Add Balance to User
             </h2>
             <form onSubmit={handleAddBalance} className="space-y-4">
-              <input
-                type="number"
-                placeholder="User ID"
-                value={userId}
-                onChange={(e) => setUserId(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                required
-              />
-              <input
-                type="number"
-                step="0.01"
-                placeholder="Amount (USDT)"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                required
-              />
-              <textarea
-                placeholder="Reason (optional)"
-                value={reason}
-                onChange={(e) => setReason(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                rows={2}
-              />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">User ID</label>
+                <input
+                  type="number"
+                  placeholder="User ID"
+                  value={userId}
+                  onChange={(e) => setUserId(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  required
+                />
+              </div>
+              {userEmail && (
+                <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm">
+                  <p className="text-blue-900">
+                    <span className="font-medium">Selected User:</span> {userEmail}
+                  </p>
+                </div>
+              )}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Amount (USDT)</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  placeholder="0.00"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Reason (optional)</label>
+                <textarea
+                  placeholder="e.g., Bonus, Refund, Adjustment"
+                  value={reason}
+                  onChange={(e) => setReason(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  rows={2}
+                />
+              </div>
               <button
                 type="submit"
-                disabled={loading}
-                className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 font-medium"
+                disabled={loading || !userId || !amount}
+                className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 font-medium transition-colors"
               >
                 {loading ? 'Adding...' : 'Add Balance'}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setUserId('');
+                  setUserEmail('');
+                  setAmount('');
+                  setReason('');
+                  setTab('users');
+                }}
+                className="w-full py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-medium transition-colors"
+              >
+                Back to Users
               </button>
             </form>
           </div>
