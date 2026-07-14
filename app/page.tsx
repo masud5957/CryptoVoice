@@ -43,31 +43,17 @@ export default function Page() {
     );
   }
 
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setState('auth');
+    setEmail('');
+  };
+
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      {/* Header - Logout Button */}
-      {isAuthenticated && (
-        <div className="bg-white border-b sticky top-0 z-40">
-          <div className="max-w-md mx-auto px-4 py-3 flex justify-end">
-            <button
-              onClick={() => {
-                setIsAuthenticated(false);
-                setState('auth');
-                setEmail('');
-              }}
-              className="text-sm text-gray-600 hover:text-gray-900 px-3 py-2 rounded hover:bg-gray-100"
-            >
-              Logout
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* Main Content */}
       {isAuthenticated ? (
-        <div className="max-w-md mx-auto px-4 py-8">
-          <Dashboard />
-        </div>
+        <Dashboard onLogout={handleLogout} />
       ) : state === 'auth' ? (
         <AuthPage
           onAuthSuccess={(userEmail) => {

@@ -26,7 +26,11 @@ interface DashboardData {
   deposits: Deposit[];
 }
 
-export function Dashboard() {
+interface DashboardProps {
+  onLogout?: () => void;
+}
+
+export function Dashboard({ onLogout }: DashboardProps) {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -185,8 +189,10 @@ export function Dashboard() {
                   <div className="border-t border-gray-100 mt-1">
                     <button 
                       onClick={() => {
-                        // Logout will be handled by parent component
-                        window.location.href = '/';
+                        setShowProfileMenu(false);
+                        if (onLogout) {
+                          onLogout();
+                        }
                       }}
                       className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
                     >
