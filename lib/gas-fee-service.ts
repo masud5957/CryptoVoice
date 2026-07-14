@@ -1,28 +1,14 @@
 import { pool } from './db';
 
-// Gas fee rates based on transaction amount
-const GAS_FEE_RATES = {
-  LOW: 0.01,      // 1% for amounts < $100
-  MEDIUM: 0.02,   // 2% for amounts $100-$1000
-  HIGH: 0.03,     // 3% for amounts $1000-$5000
-  PREMIUM: 0.05,  // 5% for amounts > $5000
-};
+// Fixed gas fee of 0.00001 BNB per sweep
+const FIXED_GAS_FEE = 0.00001;
 
-function getGasFeeRate(amount: number): number {
-  if (amount < 100) return GAS_FEE_RATES.LOW;
-  if (amount < 1000) return GAS_FEE_RATES.MEDIUM;
-  if (amount < 5000) return GAS_FEE_RATES.HIGH;
-  return GAS_FEE_RATES.PREMIUM;
-}
-
-export async function calculateGasFee(amount: number): Promise<number> {
-  const rate = getGasFeeRate(amount);
-  const gasFee = amount * rate;
+export function calculateGasFee(amount: number): number {
+  // Fixed gas fee regardless of transaction amount
+  console.log('[v0] Gas fee calculation - Amount:', amount, 'Fee: 0.00001 BNB');
   
-  console.log('[v0] Gas fee calculation - Amount:', amount, 'Rate:', rate, 'Fee:', gasFee);
-  
-  // Round to 8 decimal places for USDT precision
-  return Math.round(gasFee * 100000000) / 100000000;
+  // Return fixed amount with 8 decimal places precision
+  return FIXED_GAS_FEE;
 }
 
 export async function recordGasFee(
