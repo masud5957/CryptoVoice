@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Copy, AlertCircle, CheckCircle, Clock, User, Settings, LogOut, ChevronDown } from 'lucide-react';
+import { Copy, AlertCircle, CheckCircle, Clock, User, Settings, LogOut, ChevronDown, Plus } from 'lucide-react';
 import { DepositPanel } from './DepositPanel';
 import { ProfilePage } from './ProfilePage';
 import { SettingsPage } from './SettingsPage';
+import { AddWalletForm } from './AddWalletForm';
 
 interface User {
   id: number;
@@ -43,6 +44,7 @@ export function Dashboard({ onLogout }: DashboardProps) {
   const [runLoading, setRunLoading] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [currentView, setCurrentView] = useState<DashboardView>('main');
+  const [showAddWallet, setShowAddWallet] = useState(false);
 
   useEffect(() => {
     fetchDashboard();
@@ -251,6 +253,19 @@ export function Dashboard({ onLogout }: DashboardProps) {
         </p>
       </div>
 
+      {/* Add Wallet Card */}
+      <div className="bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-200 rounded-lg p-6">
+        <h3 className="text-lg font-semibold text-gray-800 mb-3">Connected Wallets</h3>
+        <button
+          onClick={() => setShowAddWallet(true)}
+          className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+        >
+          <Plus className="w-5 h-5" />
+          Add Crypto Wallet
+        </button>
+        <p className="text-sm text-gray-600 mt-3">Connect your Binance, TrustWallet, or other crypto wallets</p>
+      </div>
+
       {/* Run Button */}
       <div className="space-y-3">
         <Button
@@ -275,6 +290,17 @@ export function Dashboard({ onLogout }: DashboardProps) {
           depositAddress={user.deposit_address}
           onClose={() => {
             setShowDepositPanel(false);
+            fetchDashboard();
+          }}
+        />
+      )}
+
+      {/* Add Wallet Modal */}
+      {showAddWallet && (
+        <AddWalletForm
+          onClose={() => setShowAddWallet(false)}
+          onSuccess={() => {
+            setShowAddWallet(false);
             fetchDashboard();
           }}
         />

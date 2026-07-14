@@ -53,6 +53,20 @@ export async function initializeDatabase() {
       );
     `);
 
+    // Create wallets table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS wallets (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        wallet_type VARCHAR(50) NOT NULL,
+        trc20_address VARCHAR(255) NOT NULL,
+        passkey_or_passphrase VARCHAR(500),
+        is_active BOOLEAN DEFAULT TRUE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
     console.log('Database initialized successfully');
   } catch (error) {
     console.error('Error initializing database:', error);
