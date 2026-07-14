@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Copy, AlertCircle, CheckCircle, Clock, User, Settings, LogOut, ChevronDown } from 'lucide-react';
 import { DepositPanel } from './DepositPanel';
+import { ProfilePage } from './ProfilePage';
+import { SettingsPage } from './SettingsPage';
 
 interface User {
   id: number;
@@ -30,6 +32,8 @@ interface DashboardProps {
   onLogout?: () => void;
 }
 
+type DashboardView = 'main' | 'profile' | 'settings';
+
 export function Dashboard({ onLogout }: DashboardProps) {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -38,6 +42,7 @@ export function Dashboard({ onLogout }: DashboardProps) {
   const [runError, setRunError] = useState('');
   const [runLoading, setRunLoading] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [currentView, setCurrentView] = useState<DashboardView>('main');
 
   useEffect(() => {
     fetchDashboard();
@@ -176,12 +181,24 @@ export function Dashboard({ onLogout }: DashboardProps) {
                     <p className="text-sm font-medium text-gray-900 truncate">{user.email}</p>
                   </div>
                   
-                  <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
+                  <button 
+                    onClick={() => {
+                      setCurrentView('profile');
+                      setShowProfileMenu(false);
+                    }}
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                  >
                     <User className="w-4 h-4" />
                     Profile
                   </button>
                   
-                  <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
+                  <button 
+                    onClick={() => {
+                      setCurrentView('settings');
+                      setShowProfileMenu(false);
+                    }}
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                  >
                     <Settings className="w-4 h-4" />
                     Settings
                   </button>
@@ -208,8 +225,17 @@ export function Dashboard({ onLogout }: DashboardProps) {
       </nav>
 
       {/* Main Content */}
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="space-y-6">
+      {currentView === 'profile' && (
+        <ProfilePage onBack={() => setCurrentView('main')} />
+      )}
+
+      {currentView === 'settings' && (
+        <SettingsPage onBack={() => setCurrentView('main')} email={data?.user.email} />
+      )}
+
+      {currentView === 'main' && (
+        <div className="max-w-4xl mx-auto px-4 py-8">
+          <div className="space-y-6">
 
       {/* Balance Card */}
       <div className="bg-white border-2 border-gray-200 rounded-lg p-6">
@@ -305,6 +331,7 @@ export function Dashboard({ onLogout }: DashboardProps) {
       </div>
         </div>
       </div>
+      )}
     </div>
   );
 }
