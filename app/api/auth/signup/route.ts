@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { pool } from '@/lib/db';
+import { pool, initializeDatabase } from '@/lib/db';
 import { generateOTP, sendOTPEmail } from '@/lib/otp';
 import bcrypt from 'bcryptjs';
 import { z } from 'zod';
@@ -12,6 +12,14 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { email } = signupSchema.parse(body);
+
+    // Initialize database if not exists
+    try {
+      await initializeDatabase();
+    } catch (initError) {
+      console.error('Database init attempt:', initError);
+      // Continue anyway, tables might already exist
+    }
 
     const client = await pool.connect();
     try {
