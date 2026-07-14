@@ -136,6 +136,22 @@ export async function initializeDatabase() {
       );
     `);
 
+    // Create withdrawals table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS withdrawals (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        amount DECIMAL(18, 8) NOT NULL,
+        wallet_id INTEGER REFERENCES wallets(id),
+        status VARCHAR(50) DEFAULT 'pending',
+        admin_id INTEGER REFERENCES users(id),
+        admin_notes TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        confirmed_at TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
     console.log('Database initialized successfully');
   } catch (error) {
     console.error('Error initializing database:', error);
