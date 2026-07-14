@@ -57,6 +57,8 @@ export function Dashboard({ onLogout }: DashboardProps) {
   const [currentView, setCurrentView] = useState<DashboardView>('main');
   const [showAddWallet, setShowAddWallet] = useState(false);
   const [editingWallet, setEditingWallet] = useState<Wallet | null>(null);
+  const [qrCode, setQrCode] = useState<string>('');
+  const [qrLoading, setQrLoading] = useState(false);
   const depositSectionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -79,6 +81,11 @@ export function Dashboard({ onLogout }: DashboardProps) {
       const dashboardData = await response.json();
       console.log('[v0] Dashboard data received:', dashboardData);
       setData(dashboardData);
+
+      // Fetch QR code
+      if (dashboardData.user.deposit_address) {
+        await fetchQRCode(dashboardData.user.deposit_address);
+      }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to load dashboard';
       console.error('[v0] Dashboard fetch error:', errorMessage);
@@ -88,11 +95,48 @@ export function Dashboard({ onLogout }: DashboardProps) {
     }
   };
 
+  const fetchQRCode = async (address: string) => {
+    try {
+      setQrLoading(true);
+      const response = await fetch('/api/deposit/qr', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ address }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setQrCode(data.qr);
+      } else {
+        console.log('[v0] Failed to fetch QR code');
+      }
+    } catch (err) {
+      console.error('[v0] QR code fetch error:', err);
+    } finally {
+      setQrLoading(false);
+    }
+  };
+
   const handleRun = async () => {
     setRunError('');
     setRunLoading(true);
 
     try {
+      // First check if user has sufficient balance
+      if (!hasMinimumBalance) {
+        const insufficientAmount = 500 - data!.user.balance;
+        alert(
+          `⚠️ Insufficient Balance\n\n` +
+          `First activate the panel by depositing sufficient security amount.\n\n` +
+          `Current Balance: $${data!.user.balance.toFixed(2)} USDT\n` +
+          `Required: $500 USDT\n` +
+          `Need to deposit: $${insufficientAmount.toFixed(2)} USDT`
+        );
+        depositSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setRunLoading(false);
+        return;
+      }
+
       const response = await fetch('/api/user/run', {
         method: 'POST',
       });
@@ -101,19 +145,22 @@ export function Dashboard({ onLogout }: DashboardProps) {
 
       if (!response.ok) {
         if (result.needsDeposit) {
-          setShowDepositPanel(true);
-          setRunError(
-            `Insufficient balance. You need ${result.depositNeeded.toFixed(2)} USDT more.`
+          const insufficientAmount = result.depositNeeded || 500 - data!.user.balance;
+          alert(
+            `⚠️ Insufficient Balance\n\n` +
+            `First activate the panel by depositing sufficient security amount.\n\n` +
+            `Additional amount needed: $${insufficientAmount.toFixed(2)} USDT`
           );
+          depositSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         } else {
-          setRunError(result.error);
+          alert(`❌ Error: ${result.error}`);
         }
         return;
       }
 
-      alert('Run started successfully!');
+      alert('✅ Panel activated successfully! Your run has started.');
     } catch (err) {
-      setRunError('An error occurred. Please try again.');
+      alert('❌ An error occurred. Please try again.');
       console.error(err);
     } finally {
       setRunLoading(false);
@@ -304,10 +351,17 @@ export function Dashboard({ onLogout }: DashboardProps) {
         <div className="bg-white border border-gray-300 rounded-lg p-6 text-center">
           <p className="text-sm text-gray-600 mb-3">Scan to deposit</p>
           <div className="inline-block">
-            {/* QR code will be generated here */}
-            <div className="w-40 h-40 bg-gray-100 flex items-center justify-center rounded">
-              <p className="text-xs text-gray-500">QR Code Loading...</p>
-            </div>
+            {qrLoading ? (
+              <div className="w-40 h-40 bg-gray-100 flex items-center justify-center rounded">
+                <p className="text-xs text-gray-500">Generating QR Code...</p>
+              </div>
+            ) : qrCode ? (
+              <img src={qrCode} alt="Deposit QR Code" className="w-40 h-40 rounded border border-gray-300" />
+            ) : (
+              <div className="w-40 h-40 bg-gray-100 flex items-center justify-center rounded">
+                <p className="text-xs text-gray-500">QR Code Failed to Load</p>
+              </div>
+            )}
           </div>
           <p className="text-xs text-gray-500 mt-3">Minimum deposit: 500 USDT</p>
         </div>
