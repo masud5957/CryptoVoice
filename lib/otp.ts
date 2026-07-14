@@ -8,6 +8,12 @@ export function generateOTP(): string {
 
 export async function sendOTPEmail(email: string, otp: string, type: string = 'Verification'): Promise<boolean> {
   try {
+    // Check if API key exists
+    if (!process.env.RESEND_API_KEY) {
+      console.error('[v0] RESEND_API_KEY is not set');
+      return false;
+    }
+
     const subject = type === 'Password Reset' 
       ? 'Reset Your CryptoVoice Password' 
       : 'Your CryptoVoice OTP Code';
@@ -20,8 +26,10 @@ export async function sendOTPEmail(email: string, otp: string, type: string = 'V
       ? '1 hour'
       : '10 minutes';
 
-    await resend.emails.send({
-      from: 'onboarding@resend.dev',
+    console.log('[v0] Sending OTP email to:', email);
+
+    const response = await resend.emails.send({
+      from: 'noreply@cryptovoice.app',
       to: email,
       subject: subject,
       html: `
@@ -40,9 +48,18 @@ export async function sendOTPEmail(email: string, otp: string, type: string = 'V
         </div>
       `,
     });
+
+    console.log('[v0] Email sent response:', response);
+
+    if (response.error) {
+      console.error('[v0] Resend API error:', response.error);
+      return false;
+    }
+
+    console.log('[v0] OTP email sent successfully, ID:', response.data?.id);
     return true;
   } catch (error) {
-    console.error('Error sending OTP email:', error);
+    console.error('[v0] Error sending OTP email:', error);
     return false;
   }
 }
