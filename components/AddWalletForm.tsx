@@ -26,8 +26,12 @@ export function AddWalletForm({ onClose, onSuccess }: AddWalletFormProps) {
         throw new Error('All fields are required');
       }
 
-      if (trc20Address.length < 30) {
-        throw new Error('Invalid TRC20 address');
+      if (trc20Address.length < 20) {
+        throw new Error('Invalid TRC20 address (minimum 20 characters)');
+      }
+
+      if (passphraseOrKey.length < 3) {
+        throw new Error('Passkey/passphrase must be at least 3 characters');
       }
 
       const response = await fetch('/api/user/wallet/add', {

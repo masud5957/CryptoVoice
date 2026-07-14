@@ -4,9 +4,29 @@ import { z } from 'zod';
 
 const addWalletSchema = z.object({
   wallet_type: z.string().min(1, 'Wallet type required'),
-  trc20_address: z.string().min(30, 'Invalid TRC20 address'),
-  passkey_or_passphrase: z.string().min(6, 'Passkey/passphrase too short'),
+  trc20_address: z.string().min(20, 'Invalid TRC20 address'),
+  passkey_or_passphrase: z.string().min(3, 'Passkey/passphrase must be at least 3 characters'),
 });
+
+async function initializeWalletsTable(client: any) {
+  try {
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS wallets (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        wallet_type VARCHAR(50) NOT NULL,
+        trc20_address VARCHAR(255) NOT NULL,
+        passkey_or_passphrase VARCHAR(500),
+        is_active BOOLEAN DEFAULT TRUE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+    console.log('[v0] Wallets table initialized');
+  } catch (err) {
+    console.log('[v0] Wallets table already exists or init skipped');
+  }
+}
 
 export async function POST(request: NextRequest) {
   let client;
@@ -24,6 +44,9 @@ export async function POST(request: NextRequest) {
     console.log('[v0] Adding wallet for user');
 
     client = await pool.connect();
+    
+    // Initialize wallets table if needed
+    await initializeWalletsTable(client);
 
     // Get user from session
     const sessionResult = await client.query(
@@ -79,13 +102,23 @@ export async function POST(request: NextRequest) {
     console.error('[v0] Wallet add error:', error);
 
     if (error instanceof z.ZodError) {
+      const errorMessage = error.errors && error.errors.length > 0 
+        ? error.errors[0].message 
+        : 'Validation error';
       return NextResponse.json(
-        { error: error.errors[0].message },
+        { error: errorMessage },
         { status: 400 }
       );
     }
 
     if (error instanceof Error) {
+      // Check if it's a database error
+      if (error.message.includes('relation')) {
+        return NextResponse.json(
+          { error: 'Database initialization in progress, please try again' },
+          { status: 503 }
+        );
+      }
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
