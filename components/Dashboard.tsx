@@ -40,13 +40,24 @@ export function Dashboard() {
 
   const fetchDashboard = async () => {
     try {
+      console.log('[v0] Fetching dashboard data...');
       const response = await fetch('/api/user/dashboard');
-      if (!response.ok) throw new Error('Failed to fetch dashboard');
+      
+      console.log('[v0] Dashboard response status:', response.status);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.log('[v0] Dashboard error:', errorData);
+        throw new Error(errorData.error || 'Failed to fetch dashboard');
+      }
+
       const dashboardData = await response.json();
+      console.log('[v0] Dashboard data received:', dashboardData);
       setData(dashboardData);
     } catch (err) {
-      setError('Failed to load dashboard');
-      console.error(err);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load dashboard';
+      console.error('[v0] Dashboard fetch error:', errorMessage);
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -88,8 +99,38 @@ export function Dashboard() {
     return <div className="text-center py-8">Loading dashboard...</div>;
   }
 
+  if (error) {
+    return (
+      <div className="bg-red-50 border-l-4 border-red-500 p-6 rounded">
+        <div className="flex items-start gap-3">
+          <AlertCircle className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" />
+          <div>
+            <h3 className="text-red-900 font-semibold">Error Loading Dashboard</h3>
+            <p className="text-red-700 text-sm mt-1">{error}</p>
+            <button
+              onClick={() => fetchDashboard()}
+              className="mt-3 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 text-sm"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (!data) {
-    return <div className="text-center py-8 text-red-600">Failed to load dashboard</div>;
+    return (
+      <div className="bg-yellow-50 border-l-4 border-yellow-500 p-6 rounded">
+        <div className="flex items-start gap-3">
+          <AlertCircle className="w-6 h-6 text-yellow-600 flex-shrink-0 mt-0.5" />
+          <div>
+            <h3 className="text-yellow-900 font-semibold">Dashboard Not Available</h3>
+            <p className="text-yellow-700 text-sm mt-1">Please try refreshing the page.</p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const { user, deposits } = data;
