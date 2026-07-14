@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
 
     // Get user data
     const userResult = await client.query(
-      `SELECT id, email, phone, balance, deposit_address, verified, created_at FROM users WHERE id = $1`,
+      `SELECT id, email, name, phone, balance, deposit_address, verified, created_at FROM users WHERE id = $1`,
       [userId]
     );
 

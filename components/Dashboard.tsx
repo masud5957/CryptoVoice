@@ -233,16 +233,16 @@ export function Dashboard({ onLogout }: DashboardProps) {
                 <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center">
                   <User className="w-4 h-4 text-amber-600" />
                 </div>
-                <span className="text-sm font-medium text-gray-700 hidden sm:inline">{user.email.split('@')[0]}</span>
+                <span className="text-sm font-medium text-gray-700 hidden sm:inline">{user.name || user.email.split('@')[0]}</span>
                 <ChevronDown className="w-4 h-4 text-gray-500" />
               </button>
 
               {/* Dropdown Menu */}
               {showProfileMenu && (
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10">
-                  <div className="px-4 py-2 border-b border-gray-100">
-                    <p className="text-xs text-gray-500">Logged in as</p>
-                    <p className="text-sm font-medium text-gray-900 truncate">{user.email}</p>
+                  <div className="px-4 py-3 border-b border-gray-100">
+                    {user.name && <p className="text-sm font-bold text-gray-900 mb-1">{user.name}</p>}
+                    <p className="text-xs text-gray-500">{user.email}</p>
                   </div>
                   
                   <button 

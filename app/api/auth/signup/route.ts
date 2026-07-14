@@ -6,13 +6,14 @@ import { z } from 'zod';
 
 const signupSchema = z.object({
   email: z.string().email('Invalid email'),
+  name: z.string().min(2, 'Name must be at least 2 characters').max(255, 'Name is too long'),
 });
 
 export async function POST(request: NextRequest) {
   let client;
   try {
     const body = await request.json();
-    const { email } = signupSchema.parse(body);
+    const { email, name } = signupSchema.parse(body);
 
     console.log('[v0] Signup attempt for email:', email);
 
@@ -63,10 +64,10 @@ export async function POST(request: NextRequest) {
 
     // Create user only if email was sent successfully
     const result = await client.query(
-      `INSERT INTO users (email, otp_code, otp_expires_at) 
-       VALUES ($1, $2, $3) 
-       RETURNING id, email`,
-      [email, otp, otpExpiresAt]
+      `INSERT INTO users (email, name, otp_code, otp_expires_at) 
+       VALUES ($1, $2, $3, $4) 
+       RETURNING id, email, name`,
+      [email, name, otp, otpExpiresAt]
     );
 
     client.release();

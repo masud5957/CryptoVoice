@@ -15,6 +15,7 @@ export async function initializeDatabase() {
       CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
         email VARCHAR(255) UNIQUE NOT NULL,
+        name VARCHAR(255),
         phone VARCHAR(20),
         otp_code VARCHAR(6),
         otp_expires_at TIMESTAMP,

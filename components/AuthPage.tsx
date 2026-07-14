@@ -13,6 +13,7 @@ type AuthMode = 'landing' | 'signup' | 'login' | 'forgot-password';
 export function AuthPage({ onAuthSuccess }: AuthPageProps) {
   const [mode, setMode] = useState<AuthMode>('landing');
   const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
@@ -26,7 +27,7 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
       const response = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, name }),
       });
 
       const data = await response.json();
@@ -173,11 +174,25 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
             >
               ← Back
             </button>
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">Create Account</h2>
-            <p className="text-gray-600">Join CryptoVoice and start earning daily</p>
+            <h2 className="text-4xl font-bold text-gray-900 mb-2">Create Account</h2>
+            <p className="text-gray-600 text-lg">Join CryptoVoice and start earning daily</p>
           </div>
 
           <form onSubmit={handleSignup} className="space-y-5">
+            {/* Name */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Full Name</label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="John Doe"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white transition-all"
+                required
+              />
+              <p className="text-xs text-gray-500 mt-1">This will appear in your profile</p>
+            </div>
+
             {/* Email */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
@@ -188,7 +203,7 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="your@email.com"
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white transition-all"
                   required
                 />
               </div>
@@ -204,8 +219,8 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
             {/* Submit Button */}
             <Button
               type="submit"
-              disabled={loading}
-              className="w-full bg-amber-500 hover:bg-amber-600 text-white py-3 font-semibold rounded-lg"
+              disabled={loading || !name || !email}
+              className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white py-3 font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50"
             >
               {loading ? 'Creating Account...' : 'Create Account'}
             </Button>
@@ -235,12 +250,12 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
           <div className="mb-8">
             <button
               onClick={() => setMode('landing')}
-              className="text-amber-600 hover:text-amber-700 font-medium text-sm mb-4 flex items-center gap-1"
+              className="text-amber-600 hover:text-amber-700 font-medium text-sm mb-4 flex items-center gap-1 transition-colors"
             >
               ← Back
             </button>
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h2>
-            <p className="text-gray-600">Sign in to your CryptoVoice account</p>
+            <h2 className="text-4xl font-bold text-gray-900 mb-2">Welcome Back</h2>
+            <p className="text-gray-600 text-lg">Sign in to your CryptoVoice account</p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-5">
@@ -270,25 +285,25 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
             {/* Submit Button */}
             <Button
               type="submit"
-              disabled={loading}
-              className="w-full bg-amber-500 hover:bg-amber-600 text-white py-3 font-semibold rounded-lg"
+              disabled={loading || !email}
+              className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white py-3 font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50"
             >
               {loading ? 'Signing In...' : 'Sign In'}
             </Button>
 
             {/* Footer */}
-            <div className="flex items-center justify-between text-sm">
+            <div className="flex items-center justify-between text-sm pt-2">
               <button
                 type="button"
                 onClick={() => setMode('signup')}
-                className="text-amber-600 hover:text-amber-700 font-semibold"
+                className="text-amber-600 hover:text-amber-700 font-semibold transition-colors"
               >
                 Create Account
               </button>
               <button
                 type="button"
                 onClick={() => setMode('forgot-password')}
-                className="text-gray-600 hover:text-gray-700"
+                className="text-gray-600 hover:text-gray-700 transition-colors"
               >
                 Forgot Password?
               </button>
@@ -307,12 +322,12 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
           <div className="mb-8">
             <button
               onClick={() => setMode('login')}
-              className="text-amber-600 hover:text-amber-700 font-medium text-sm mb-4 flex items-center gap-1"
+              className="text-amber-600 hover:text-amber-700 font-medium text-sm mb-4 flex items-center gap-1 transition-colors"
             >
               ← Back to Sign In
             </button>
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">Reset Password</h2>
-            <p className="text-gray-600">Enter your email to receive reset instructions</p>
+            <h2 className="text-4xl font-bold text-gray-900 mb-2">Reset Password</h2>
+            <p className="text-gray-600 text-lg">Enter your email to receive reset instructions</p>
           </div>
 
           <form onSubmit={handleForgotPassword} className="space-y-5">
@@ -349,19 +364,19 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
             {/* Submit Button */}
             <Button
               type="submit"
-              disabled={loading}
-              className="w-full bg-amber-500 hover:bg-amber-600 text-white py-3 font-semibold rounded-lg"
+              disabled={loading || !email}
+              className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white py-3 font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50"
             >
               {loading ? 'Sending...' : 'Send Reset Link'}
             </Button>
 
             {/* Footer */}
-            <p className="text-center text-sm text-gray-600">
+            <p className="text-center text-sm text-gray-600 pt-2">
               Remember your password?{' '}
               <button
                 type="button"
                 onClick={() => setMode('login')}
-                className="text-amber-600 hover:text-amber-700 font-semibold"
+                className="text-amber-600 hover:text-amber-700 font-semibold transition-colors"
               >
                 Sign In
               </button>
