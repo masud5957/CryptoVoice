@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Copy, AlertCircle, CheckCircle, Clock } from 'lucide-react';
+import { Copy, AlertCircle, CheckCircle, Clock, User, Settings, LogOut, ChevronDown } from 'lucide-react';
 import { DepositPanel } from './DepositPanel';
 
 interface User {
@@ -33,6 +33,7 @@ export function Dashboard() {
   const [showDepositPanel, setShowDepositPanel] = useState(false);
   const [runError, setRunError] = useState('');
   const [runLoading, setRunLoading] = useState(false);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
 
   useEffect(() => {
     fetchDashboard();
@@ -137,12 +138,72 @@ export function Dashboard() {
   const hasMinimumBalance = user.balance >= 500;
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-lg p-6">
-        <h1 className="text-3xl font-bold">CryptoVoice</h1>
-        <p className="text-amber-100 mt-1">Active Panel</p>
-      </div>
+    <div className="min-h-screen bg-gray-50">
+      {/* Professional Navigation Bar */}
+      <nav className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            {/* Logo */}
+            <div className="flex items-center gap-2">
+              <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-lg">CV</span>
+              </div>
+              <h1 className="text-xl font-bold text-gray-900">CryptoVoice</h1>
+            </div>
+
+            {/* Right side - Profile Menu */}
+            <div className="relative">
+              <button
+                onClick={() => setShowProfileMenu(!showProfileMenu)}
+                className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center">
+                  <User className="w-4 h-4 text-amber-600" />
+                </div>
+                <span className="text-sm font-medium text-gray-700 hidden sm:inline">{user.email.split('@')[0]}</span>
+                <ChevronDown className="w-4 h-4 text-gray-500" />
+              </button>
+
+              {/* Dropdown Menu */}
+              {showProfileMenu && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10">
+                  <div className="px-4 py-2 border-b border-gray-100">
+                    <p className="text-xs text-gray-500">Logged in as</p>
+                    <p className="text-sm font-medium text-gray-900 truncate">{user.email}</p>
+                  </div>
+                  
+                  <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
+                    <User className="w-4 h-4" />
+                    Profile
+                  </button>
+                  
+                  <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
+                    <Settings className="w-4 h-4" />
+                    Settings
+                  </button>
+
+                  <div className="border-t border-gray-100 mt-1">
+                    <button 
+                      onClick={() => {
+                        // Logout will be handled by parent component
+                        window.location.href = '/';
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Logout
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Main Content */}
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        <div className="space-y-6">
 
       {/* Balance Card */}
       <div className="bg-white border-2 border-gray-200 rounded-lg p-6">
@@ -235,6 +296,8 @@ export function Dashboard() {
         <p>
           <strong>Phone:</strong> {user.phone}
         </p>
+      </div>
+        </div>
       </div>
     </div>
   );
