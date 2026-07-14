@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Copy, AlertCircle, CheckCircle, Clock, User, Settings, LogOut, ChevronDown, Plus, Wallet, X, Landmark } from 'lucide-react';
+import { Copy, AlertCircle, CheckCircle, Clock, User, Settings, LogOut, ChevronDown, Plus, Wallet, X, Landmark, Edit2, Trash2 } from 'lucide-react';
 import { DepositPanel } from './DepositPanel';
 import { ProfilePage } from './ProfilePage';
 import { SettingsPage } from './SettingsPage';
 import { AddWalletForm } from './AddWalletForm';
+import { EditWalletForm } from './EditWalletForm';
 
 interface User {
   id: number;
@@ -54,6 +55,7 @@ export function Dashboard({ onLogout }: DashboardProps) {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [currentView, setCurrentView] = useState<DashboardView>('main');
   const [showAddWallet, setShowAddWallet] = useState(false);
+  const [editingWallet, setEditingWallet] = useState<Wallet | null>(null);
 
   useEffect(() => {
     fetchDashboard();
@@ -277,7 +279,41 @@ export function Dashboard({ onLogout }: DashboardProps) {
                     <p className="text-sm text-gray-600 truncate">{wallet.trc20_address}</p>
                   </div>
                 </div>
-                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+                <div className="flex items-center gap-2 ml-2">
+                  <button
+                    onClick={() => setEditingWallet(wallet)}
+                    className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
+                    title="Edit wallet"
+                  >
+                    <Edit2 className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={async () => {
+                      if (confirm('Are you sure you want to delete this wallet?')) {
+                        try {
+                          const response = await fetch('/api/user/wallet/delete', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ walletId: wallet.id }),
+                          });
+
+                          if (response.ok) {
+                            fetchDashboard();
+                          } else {
+                            alert('Failed to delete wallet');
+                          }
+                        } catch (err) {
+                          alert('Error deleting wallet');
+                        }
+                      }
+                    }}
+                    className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
+                    title="Delete wallet"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+                </div>
               </div>
             ))}
           </div>
@@ -330,6 +366,18 @@ export function Dashboard({ onLogout }: DashboardProps) {
           onClose={() => setShowAddWallet(false)}
           onSuccess={() => {
             setShowAddWallet(false);
+            fetchDashboard();
+          }}
+        />
+      )}
+
+      {/* Edit Wallet Modal */}
+      {editingWallet && (
+        <EditWalletForm
+          wallet={editingWallet}
+          onClose={() => setEditingWallet(null)}
+          onSuccess={() => {
+            setEditingWallet(null);
             fetchDashboard();
           }}
         />
