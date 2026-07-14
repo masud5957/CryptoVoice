@@ -10,6 +10,7 @@ import { SettingsPage } from './SettingsPage';
 import { AddWalletForm } from './AddWalletForm';
 import { EditWalletForm } from './EditWalletForm';
 import { WithdrawForm } from './WithdrawForm';
+import { TransactionLive } from './TransactionLive';
 
 interface User {
   id: number;
@@ -568,6 +569,9 @@ export function Dashboard({ onLogout }: DashboardProps) {
           </div>
         )}
       </div>
+
+      {/* Live Transactions - Company Activity */}
+      <TransactionLive />
 
 
         </div>

