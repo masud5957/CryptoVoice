@@ -99,7 +99,7 @@ export function Dashboard() {
     <div className="space-y-6">
       {/* Header */}
       <div className="bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-lg p-6">
-        <h1 className="text-3xl font-bold">Binance Work</h1>
+        <h1 className="text-3xl font-bold">CryptoVoice</h1>
         <p className="text-amber-100 mt-1">Active Panel</p>
       </div>
 
