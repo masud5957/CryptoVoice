@@ -269,10 +269,23 @@ export function Dashboard({ onLogout }: DashboardProps) {
 
                   <div className="border-t border-gray-100 mt-1">
                     <button 
-                      onClick={() => {
+                      onClick={async () => {
                         setShowProfileMenu(false);
-                        if (onLogout) {
-                          onLogout();
+                        try {
+                          // Call logout API to clear session
+                          await fetch('/api/auth/logout', { method: 'POST' });
+                          // Clear session token from localStorage if stored there
+                          localStorage.removeItem('sessionToken');
+                          // Call the logout callback
+                          if (onLogout) {
+                            onLogout();
+                          }
+                        } catch (error) {
+                          console.error('[v0] Logout error:', error);
+                          // Still logout on client side even if API call fails
+                          if (onLogout) {
+                            onLogout();
+                          }
                         }
                       }}
                       className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"

@@ -24,9 +24,15 @@ export default function Page() {
       if (response.ok) {
         setIsAuthenticated(true);
         setState('dashboard');
+      } else if (response.status === 401) {
+        // Session invalid or expired
+        setIsAuthenticated(false);
+        setState('auth');
       }
-    } catch {
+    } catch (error) {
       // Not authenticated
+      setIsAuthenticated(false);
+      setState('auth');
     } finally {
       setLoading(false);
     }
