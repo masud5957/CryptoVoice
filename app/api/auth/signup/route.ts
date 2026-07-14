@@ -6,13 +6,12 @@ import { z } from 'zod';
 
 const signupSchema = z.object({
   email: z.string().email('Invalid email'),
-  phone: z.string().min(10, 'Invalid phone number'),
 });
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email, phone } = signupSchema.parse(body);
+    const { email } = signupSchema.parse(body);
 
     const client = await pool.connect();
     try {
@@ -35,10 +34,10 @@ export async function POST(request: NextRequest) {
 
       // Create user
       const result = await client.query(
-        `INSERT INTO users (email, phone, otp_code, otp_expires_at) 
-         VALUES ($1, $2, $3, $4) 
+        `INSERT INTO users (email, otp_code, otp_expires_at) 
+         VALUES ($1, $2, $3) 
          RETURNING id, email`,
-        [email, phone, otp, otpExpiresAt]
+        [email, otp, otpExpiresAt]
       );
 
       // Send OTP email

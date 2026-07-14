@@ -13,7 +13,6 @@ type AuthMode = 'landing' | 'signup' | 'login' | 'forgot-password';
 export function AuthPage({ onAuthSuccess }: AuthPageProps) {
   const [mode, setMode] = useState<AuthMode>('landing');
   const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
@@ -27,7 +26,7 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
       const response = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, phone }),
+        body: JSON.stringify({ email }),
       });
 
       const data = await response.json();
@@ -111,9 +110,9 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
             <div className="inline-flex items-center justify-center w-16 h-16 bg-amber-500 rounded-full mb-6">
               <Zap className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-4xl font-bold text-white mb-4">Binance Work</h1>
-            <p className="text-xl text-amber-100 mb-6">Earn daily profit with Binance Work</p>
-            <p className="text-gray-300 mb-8">Start your journey to consistent passive income through smart crypto trading strategies</p>
+            <h1 className="text-4xl font-bold text-white mb-4">CryptoVoice</h1>
+            <p className="text-xl text-amber-100 mb-6">Earn daily profit with CryptoVoice</p>
+            <p className="text-gray-300 mb-8">Work with Binance, TrustWallet, and any crypto wallet. Start your journey to consistent passive income through smart crypto trading strategies</p>
 
             {/* Features */}
             <div className="space-y-4 mb-12">
@@ -123,7 +122,7 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
               </div>
               <div className="flex items-center gap-3 text-gray-200">
                 <CheckCircle className="w-5 h-5 text-amber-400 flex-shrink-0" />
-                <span>Minimum 500 USDT to start</span>
+                <span>Multi-wallet support</span>
               </div>
               <div className="flex items-center gap-3 text-gray-200">
                 <CheckCircle className="w-5 h-5 text-amber-400 flex-shrink-0" />
@@ -134,12 +133,11 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
             {/* CTA Buttons */}
             <div className="flex flex-col gap-3">
               <Button
-                onClick={() => {
-                  setMode('signup');
-                  setError('');
-                  setEmail('');
-                  setPhone('');
-                }}
+              onClick={() => {
+                setMode('signup');
+                setError('');
+                setEmail('');
+              }}
                 className="w-full bg-amber-500 hover:bg-amber-600 text-white py-6 text-lg font-semibold rounded-lg flex items-center justify-center gap-2"
               >
                 Create Account
@@ -176,7 +174,7 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
               ← Back
             </button>
             <h2 className="text-3xl font-bold text-gray-900 mb-2">Create Account</h2>
-            <p className="text-gray-600">Join Binance Work and start earning daily</p>
+            <p className="text-gray-600">Join CryptoVoice and start earning daily</p>
           </div>
 
           <form onSubmit={handleSignup} className="space-y-5">
@@ -194,19 +192,6 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
                   required
                 />
               </div>
-            </div>
-
-            {/* Phone */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Phone Number</label>
-              <input
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="+1234567890"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white"
-                required
-              />
             </div>
 
             {/* Error */}

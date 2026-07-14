@@ -12,10 +12,11 @@ export async function initializeDatabase() {
       CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
         email VARCHAR(255) UNIQUE NOT NULL,
-        phone VARCHAR(20) NOT NULL,
-        binance_pin VARCHAR(255) NOT NULL,
+        phone VARCHAR(20),
         otp_code VARCHAR(6),
         otp_expires_at TIMESTAMP,
+        reset_token VARCHAR(255),
+        reset_token_expires_at TIMESTAMP,
         verified BOOLEAN DEFAULT FALSE,
         balance DECIMAL(18, 8) DEFAULT 0,
         deposit_address VARCHAR(255),

@@ -3,8 +3,8 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Binance Work - BEP20 Deposit Platform',
-  description: 'Binance Work - Deposit platform with BEP20 support and balance management',
+  title: 'CryptoVoice - Multi-Wallet Crypto Platform',
+  description: 'CryptoVoice - Work with Binance, TrustWallet, and any crypto wallet. Earn daily profit with BEP20 support and balance management',
   generator: 'v0.app',
   icons: {
     icon: [
