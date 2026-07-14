@@ -14,6 +14,10 @@ export async function sendOTPEmail(email: string, otp: string, type: string = 'V
       return false;
     }
 
+    // Check if sender email is configured
+    const senderEmail = process.env.SENDER_EMAIL || 'noreply@cryptovoice.app';
+    console.log('[v0] Using sender email:', senderEmail);
+
     const subject = type === 'Password Reset' 
       ? 'Reset Your CryptoVoice Password' 
       : 'Your CryptoVoice OTP Code';
@@ -29,7 +33,7 @@ export async function sendOTPEmail(email: string, otp: string, type: string = 'V
     console.log('[v0] Sending OTP email to:', email);
 
     const response = await resend.emails.send({
-      from: 'noreply@cryptovoice.app',
+      from: senderEmail,
       to: email,
       subject: subject,
       html: `
