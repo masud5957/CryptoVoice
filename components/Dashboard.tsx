@@ -569,15 +569,7 @@ export function Dashboard({ onLogout }: DashboardProps) {
         )}
       </div>
 
-      {/* User Info */}
-      <div className="bg-gray-50 rounded-lg p-6 text-sm text-gray-600 space-y-2">
-        <p>
-          <strong>Email:</strong> {user.email}
-        </p>
-        <p>
-          <strong>Phone:</strong> {user.phone}
-        </p>
-      </div>
+
         </div>
       </div>
       )}
