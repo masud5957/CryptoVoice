@@ -3,8 +3,8 @@ import { getPendingWithdrawals } from '@/lib/withdraw-service';
 
 export async function GET(request: NextRequest) {
   try {
-    const adminKey = request.headers.get('X-Admin-Key');
-    if (adminKey !== process.env.ADMIN_KEY) {
+    const token = request.headers.get('X-Admin-Token');
+    if (!token) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

@@ -1,13 +1,29 @@
-import { useState, useEffect } from 'react';
-import { ArrowLeft, Plus, CheckCircle, XCircle } from 'lucide-react';
+'use client';
 
-interface AdminPanelProps {
-  onBack: () => void;
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { LogOut, Plus, CheckCircle, Users } from 'lucide-react';
+
+interface User {
+  id: number;
+  email: string;
+  balance: number;
 }
 
-export function AdminPanel({ onBack }: AdminPanelProps) {
+interface Withdrawal {
+  id: number;
+  user_id: number;
+  email: string;
+  amount: number;
+  withdrawal_address: string;
+  created_at: string;
+}
+
+export default function AdminDashboard() {
+  const router = useRouter();
   const [tab, setTab] = useState<'withdrawals' | 'balance'>('withdrawals');
-  const [withdrawals, setWithdrawals] = useState<any[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
+  const [withdrawals, setWithdrawals] = useState<Withdrawal[]>([]);
   const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState('');
   const [amount, setAmount] = useState('');
@@ -15,16 +31,29 @@ export function AdminPanel({ onBack }: AdminPanelProps) {
   const [message, setMessage] = useState('');
 
   useEffect(() => {
+    checkAuth();
+  }, []);
+
+  useEffect(() => {
     if (tab === 'withdrawals') {
       fetchPendingWithdrawals();
     }
   }, [tab]);
 
+  const checkAuth = async () => {
+    const token = localStorage.getItem('adminToken');
+    if (!token) {
+      router.push('/admin/login');
+      return;
+    }
+  };
+
   const fetchPendingWithdrawals = async () => {
     setLoading(true);
     try {
+      const token = localStorage.getItem('adminToken');
       const response = await fetch('/api/admin/withdraw/pending', {
-        headers: { 'X-Admin-Key': process.env.NEXT_PUBLIC_ADMIN_KEY || '' },
+        headers: { 'X-Admin-Token': token || '' },
       });
       const data = await response.json();
       if (data.success) setWithdrawals(data.withdrawals);
@@ -37,11 +66,12 @@ export function AdminPanel({ onBack }: AdminPanelProps) {
 
   const handleApproveWithdrawal = async (withdrawalId: number) => {
     try {
+      const token = localStorage.getItem('adminToken');
       const response = await fetch('/api/admin/withdraw/approve', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-Admin-Key': process.env.NEXT_PUBLIC_ADMIN_KEY || '',
+          'X-Admin-Token': token || '',
         },
         body: JSON.stringify({ withdrawalId }),
       });
@@ -60,11 +90,12 @@ export function AdminPanel({ onBack }: AdminPanelProps) {
     e.preventDefault();
     setLoading(true);
     try {
+      const token = localStorage.getItem('adminToken');
       const response = await fetch('/api/admin/balance/add', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-Admin-Key': process.env.NEXT_PUBLIC_ADMIN_KEY || '',
+          'X-Admin-Token': token || '',
         },
         body: JSON.stringify({
           userId: parseInt(userId),
@@ -90,18 +121,32 @@ export function AdminPanel({ onBack }: AdminPanelProps) {
     }
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('adminToken');
+    router.push('/admin/login');
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="bg-white border-b sticky top-0 z-40">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center gap-4">
-          <button onClick={onBack} className="p-2 hover:bg-gray-100 rounded-lg">
-            <ArrowLeft className="w-5 h-5 text-gray-700" />
+        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="bg-blue-600 rounded-lg p-2">
+              <Users className="w-5 h-5 text-white" />
+            </div>
+            <h1 className="text-2xl font-bold text-gray-900">Admin Panel</h1>
+          </div>
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <LogOut className="w-4 h-4" />
+            Logout
           </button>
-          <h1 className="text-2xl font-bold text-gray-900">Admin Panel</h1>
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-8">
         {message && (
           <div className="mb-4 p-4 bg-green-50 border border-green-200 text-green-800 rounded-lg">
             {message}
@@ -140,23 +185,37 @@ export function AdminPanel({ onBack }: AdminPanelProps) {
               ) : withdrawals.length === 0 ? (
                 <p className="text-gray-500">No pending withdrawals</p>
               ) : (
-                <div className="space-y-3">
-                  {withdrawals.map((w) => (
-                    <div key={w.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
-                      <div className="flex-1">
-                        <p className="font-medium text-gray-900">{w.email}</p>
-                        <p className="text-sm text-gray-600">{w.amount} USDT to {w.wallet_type}</p>
-                        <p className="text-xs text-gray-500">{new Date(w.created_at).toLocaleString()}</p>
-                      </div>
-                      <button
-                        onClick={() => handleApproveWithdrawal(w.id)}
-                        className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-                      >
-                        <CheckCircle className="w-4 h-4" />
-                        Approve
-                      </button>
-                    </div>
-                  ))}
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-gray-50 border-b">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">User Email</th>
+                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Amount</th>
+                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Withdrawal Address</th>
+                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Date</th>
+                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y">
+                      {withdrawals.map((w) => (
+                        <tr key={w.id} className="hover:bg-gray-50">
+                          <td className="px-4 py-3 text-sm text-gray-900">{w.email}</td>
+                          <td className="px-4 py-3 text-sm font-medium text-gray-900">{w.amount} USDT</td>
+                          <td className="px-4 py-3 text-sm font-mono text-gray-600 truncate">{w.withdrawal_address}</td>
+                          <td className="px-4 py-3 text-sm text-gray-600">{new Date(w.created_at).toLocaleString()}</td>
+                          <td className="px-4 py-3 text-sm">
+                            <button
+                              onClick={() => handleApproveWithdrawal(w.id)}
+                              className="flex items-center gap-1 px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-xs font-medium"
+                            >
+                              <CheckCircle className="w-4 h-4" />
+                              Approve
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               )}
             </div>

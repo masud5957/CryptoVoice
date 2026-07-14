@@ -5,7 +5,7 @@ import { z } from 'zod';
 
 const withdrawSchema = z.object({
   amount: z.number().positive(),
-  walletId: z.number().int().positive(),
+  withdrawalAddress: z.string().regex(/^0x[a-fA-F0-9]{40}$/, 'Invalid BEP20 address'),
 });
 
 export async function POST(request: NextRequest) {
@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
     if (!sessionToken) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const body = await request.json();
-    const { amount, walletId } = withdrawSchema.parse(body);
+    const { amount, withdrawalAddress } = withdrawSchema.parse(body);
 
     client = await pool.connect();
     const userResult = await client.query(
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     const userId = userResult.rows[0].user_id;
     client.release();
 
-    const result = await createWithdrawalRequest(userId, amount, walletId);
+    const result = await createWithdrawalRequest(userId, amount, withdrawalAddress);
     if (!result.success) return NextResponse.json({ error: result.error }, { status: 400 });
 
     return NextResponse.json({ success: true, requestId: result.requestId });

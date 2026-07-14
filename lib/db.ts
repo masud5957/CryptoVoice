@@ -142,6 +142,7 @@ export async function initializeDatabase() {
         id SERIAL PRIMARY KEY,
         user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
         amount DECIMAL(18, 8) NOT NULL,
+        withdrawal_address VARCHAR(255),
         wallet_id INTEGER REFERENCES wallets(id),
         status VARCHAR(50) DEFAULT 'pending',
         admin_id INTEGER REFERENCES users(id),

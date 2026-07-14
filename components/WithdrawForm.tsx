@@ -1,17 +1,15 @@
 import { useState } from 'react';
 import { X, ArrowUpRight, AlertCircle, CheckCircle } from 'lucide-react';
-import { Wallet } from './Dashboard';
 
 interface WithdrawFormProps {
   userBalance: number;
-  userWallets: Wallet[];
   onClose: () => void;
   onSuccess: () => void;
 }
 
-export function WithdrawForm({ userBalance, userWallets, onClose, onSuccess }: WithdrawFormProps) {
+export function WithdrawForm({ userBalance, onClose, onSuccess }: WithdrawFormProps) {
   const [amount, setAmount] = useState('');
-  const [selectedWallet, setSelectedWallet] = useState(userWallets[0]?.id || '');
+  const [withdrawalAddress, setWithdrawalAddress] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
@@ -22,7 +20,7 @@ export function WithdrawForm({ userBalance, userWallets, onClose, onSuccess }: W
     setLoading(true);
 
     try {
-      if (!amount || !selectedWallet) {
+      if (!amount || !withdrawalAddress) {
         throw new Error('Please fill all fields');
       }
 
@@ -36,12 +34,17 @@ export function WithdrawForm({ userBalance, userWallets, onClose, onSuccess }: W
         throw new Error('Amount must be greater than 0');
       }
 
+      // Validate BEP20 address format (0x + 40 hex characters)
+      if (!/^0x[a-fA-F0-9]{40}$/.test(withdrawalAddress)) {
+        throw new Error('Invalid BEP20 address format');
+      }
+
       const response = await fetch('/api/user/withdraw/request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           amount: withdrawAmount,
-          walletId: parseInt(selectedWallet),
+          withdrawalAddress: withdrawalAddress.toLowerCase(),
         }),
       });
 
@@ -89,19 +92,15 @@ export function WithdrawForm({ userBalance, userWallets, onClose, onSuccess }: W
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Select Wallet</label>
-            <select
-              value={selectedWallet}
-              onChange={(e) => setSelectedWallet(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="">Choose a wallet...</option>
-              {userWallets.map((wallet) => (
-                <option key={wallet.id} value={wallet.id}>
-                  {wallet.wallet_type} - {wallet.trc20_address.slice(0, 10)}...
-                </option>
-              ))}
-            </select>
+            <label className="block text-sm font-medium text-gray-700 mb-2">BEP20 Address</label>
+            <input
+              type="text"
+              value={withdrawalAddress}
+              onChange={(e) => setWithdrawalAddress(e.target.value)}
+              placeholder="0x..."
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
+            />
+            <p className="text-xs text-gray-500 mt-1">Enter your BEP20 wallet address on BSC network</p>
           </div>
 
           <div>

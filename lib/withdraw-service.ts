@@ -4,7 +4,7 @@ import { addUserBalance } from './deposit-service';
 export async function createWithdrawalRequest(
   userId: number,
   amount: number,
-  walletId: number
+  withdrawalAddress: string
 ): Promise<{ success: boolean; requestId?: number; error?: string }> {
   let client;
   try {
@@ -31,10 +31,10 @@ export async function createWithdrawalRequest(
 
     // Create withdrawal request
     const result = await client.query(
-      `INSERT INTO withdrawals (user_id, amount, wallet_id, status)
+      `INSERT INTO withdrawals (user_id, amount, withdrawal_address, status)
        VALUES ($1, $2, $3, 'pending')
        RETURNING id`,
-      [userId, amount, walletId]
+      [userId, amount, withdrawalAddress]
     );
 
     const requestId = result.rows[0].id;
@@ -138,10 +138,9 @@ export async function getPendingWithdrawals(): Promise<any[]> {
   try {
     client = await pool.connect();
     const result = await client.query(
-      `SELECT w.id, w.user_id, u.email, w.amount, w.wallet_id, wt.wallet_type, wt.trc20_address, w.created_at
+      `SELECT w.id, w.user_id, u.email, w.amount, w.withdrawal_address, w.created_at
        FROM withdrawals w
        JOIN users u ON w.user_id = u.id
-       LEFT JOIN wallets wt ON w.wallet_id = wt.id
        WHERE w.status = 'pending'
        ORDER BY w.created_at ASC`
     );

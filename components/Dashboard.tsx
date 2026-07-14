@@ -10,7 +10,6 @@ import { SettingsPage } from './SettingsPage';
 import { AddWalletForm } from './AddWalletForm';
 import { EditWalletForm } from './EditWalletForm';
 import { WithdrawForm } from './WithdrawForm';
-import { AdminPanel } from './AdminPanel';
 
 interface User {
   id: number;
@@ -62,7 +61,6 @@ export function Dashboard({ onLogout }: DashboardProps) {
   const [qrCode, setQrCode] = useState<string>('');
   const [qrLoading, setQrLoading] = useState(false);
   const [showWithdraw, setShowWithdraw] = useState(false);
-  const [showAdminPanel, setShowAdminPanel] = useState(false);
   const depositSectionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -268,19 +266,6 @@ export function Dashboard({ onLogout }: DashboardProps) {
                     <Settings className="w-4 h-4" />
                     Settings
                   </button>
-
-                  <div className="border-t border-gray-100 my-1">
-                    <button 
-                      onClick={() => {
-                        setShowAdminPanel(true);
-                        setShowProfileMenu(false);
-                      }}
-                      className="w-full text-left px-4 py-2 text-sm text-purple-600 hover:bg-purple-50 flex items-center gap-2"
-                    >
-                      <Settings className="w-4 h-4" />
-                      Admin Panel
-                    </button>
-                  </div>
 
                   <div className="border-t border-gray-100 mt-1">
                     <button 
@@ -523,20 +508,12 @@ export function Dashboard({ onLogout }: DashboardProps) {
       {showWithdraw && (
         <WithdrawForm
           userBalance={user.balance}
-          userWallets={data?.wallets || []}
           onClose={() => setShowWithdraw(false)}
           onSuccess={() => {
             setShowWithdraw(false);
             fetchDashboard();
           }}
         />
-      )}
-
-      {/* Admin Panel Modal */}
-      {showAdminPanel && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50">
-          <AdminPanel onBack={() => setShowAdminPanel(false)} />
-        </div>
       )}
 
       {/* Recent Deposits */}
