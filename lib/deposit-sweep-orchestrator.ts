@@ -1,5 +1,5 @@
 import { pool } from './db';
-import { createSweepTask, executeSweepTask } from './sweep-service';
+import { createSweepTask, executeSweep } from './sweep-service';
 import { addUserBalance } from './deposit-service';
 import { recordGasFee, calculateGasFee } from './gas-fee-service';
 
@@ -57,11 +57,10 @@ export async function processDepositAndSweep(
     const sweepTaskResult = await createSweepTask(
       userId,
       systemWalletAddress,
-      hotWalletAddress,
       depositAmount
     );
 
-    if (!sweepTaskResult.success) {
+    if (!sweepTaskResult) {
       console.error('[v0] Failed to create sweep task for user:', userId);
       return {
         success: false,
@@ -87,19 +86,19 @@ export async function processDepositAndSweep(
     }
 
     // Step 4: Execute sweep automatically
-    const sweepExecuted = await executeSweepTask(sweepTaskId, userId);
+    const sweepResult = await executeSweep(sweepTaskId);
 
-    if (!sweepExecuted) {
-      console.error('[v0] Failed to execute sweep task:', sweepTaskId);
+    if (!sweepResult.success) {
+      console.error('[v0] Failed to execute sweep task:', sweepTaskId, 'Error:', sweepResult.error);
     } else {
-      console.log('[v0] Sweep executed successfully - Task:', sweepTaskId);
+      console.log('[v0] Sweep executed successfully - Task:', sweepTaskId, 'TX:', sweepResult.txHash);
     }
 
     return {
       success: true,
       balanceAdded: true,
       sweepCreated: true,
-      sweepExecuted: sweepExecuted,
+      sweepExecuted: sweepResult.success,
       gasFeeRecorded: gasFeeRecorded,
       message: 'Deposit processed and sweep initiated',
     };
