@@ -3,12 +3,14 @@
 import { useEffect, useState, useRef } from 'react';
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Copy, AlertCircle, CheckCircle, Clock, User, Settings, LogOut, ChevronDown, Plus, Wallet, X, Landmark, Edit2, Trash2 } from 'lucide-react';
+import { Copy, AlertCircle, CheckCircle, Clock, User, Settings, LogOut, ChevronDown, Plus, Wallet, X, Landmark, Edit2, Trash2, ArrowDownLeft, ArrowUpRight } from 'lucide-react';
 import { DepositPanel } from './DepositPanel';
 import { ProfilePage } from './ProfilePage';
 import { SettingsPage } from './SettingsPage';
 import { AddWalletForm } from './AddWalletForm';
 import { EditWalletForm } from './EditWalletForm';
+import { WithdrawForm } from './WithdrawForm';
+import { AdminPanel } from './AdminPanel';
 
 interface User {
   id: number;
@@ -59,6 +61,8 @@ export function Dashboard({ onLogout }: DashboardProps) {
   const [editingWallet, setEditingWallet] = useState<Wallet | null>(null);
   const [qrCode, setQrCode] = useState<string>('');
   const [qrLoading, setQrLoading] = useState(false);
+  const [showWithdraw, setShowWithdraw] = useState(false);
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
   const depositSectionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -265,6 +269,19 @@ export function Dashboard({ onLogout }: DashboardProps) {
                     Settings
                   </button>
 
+                  <div className="border-t border-gray-100 my-1">
+                    <button 
+                      onClick={() => {
+                        setShowAdminPanel(true);
+                        setShowProfileMenu(false);
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-purple-600 hover:bg-purple-50 flex items-center gap-2"
+                    >
+                      <Settings className="w-4 h-4" />
+                      Admin Panel
+                    </button>
+                  </div>
+
                   <div className="border-t border-gray-100 mt-1">
                     <button 
                       onClick={() => {
@@ -315,14 +332,24 @@ export function Dashboard({ onLogout }: DashboardProps) {
             </p>
           </div>
         </div>
-        <button
-          onClick={() => {
-            depositSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }}
-          className="w-full py-3 px-4 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors font-medium mt-4"
-        >
-          Deposit USDT
-        </button>
+        <div className="grid grid-cols-2 gap-3 mt-6">
+          <button
+            onClick={() => {
+              depositSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }}
+            className="flex items-center justify-center gap-2 py-3 px-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
+          >
+            <ArrowDownLeft className="w-5 h-5" />
+            Deposit
+          </button>
+          <button
+            onClick={() => setShowWithdraw(true)}
+            className="flex items-center justify-center gap-2 py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+          >
+            <ArrowUpRight className="w-5 h-5" />
+            Withdraw
+          </button>
+        </div>
       </div>
 
       {/* System Wallet Deposit Section */}
@@ -490,6 +517,26 @@ export function Dashboard({ onLogout }: DashboardProps) {
             fetchDashboard();
           }}
         />
+      )}
+
+      {/* Withdraw Modal */}
+      {showWithdraw && (
+        <WithdrawForm
+          userBalance={user.balance}
+          userWallets={data?.wallets || []}
+          onClose={() => setShowWithdraw(false)}
+          onSuccess={() => {
+            setShowWithdraw(false);
+            fetchDashboard();
+          }}
+        />
+      )}
+
+      {/* Admin Panel Modal */}
+      {showAdminPanel && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50">
+          <AdminPanel onBack={() => setShowAdminPanel(false)} />
+        </div>
       )}
 
       {/* Recent Deposits */}
