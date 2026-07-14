@@ -1,31 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { pool } from '@/lib/db';
 import { generateOTP, sendOTPEmail } from '@/lib/otp';
-import bcrypt from 'bcryptjs';
 import { z } from 'zod';
 
-const signupSchema = z.object({
+const loginSchema = z.object({
   email: z.string().email('Invalid email'),
-  phone: z.string().min(10, 'Invalid phone number'),
 });
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email, phone } = signupSchema.parse(body);
+    const { email } = loginSchema.parse(body);
 
     const client = await pool.connect();
     try {
-      // Check if user already exists
-      const existingUser = await client.query(
-        'SELECT id FROM users WHERE email = $1',
+      // Check if user exists
+      const userResult = await client.query(
+        'SELECT id, email FROM users WHERE email = $1',
         [email]
       );
 
-      if (existingUser.rows.length > 0) {
+      if (userResult.rows.length === 0) {
         return NextResponse.json(
-          { error: 'Email already registered' },
-          { status: 400 }
+          { error: 'User not found' },
+          { status: 404 }
         );
       }
 
@@ -33,12 +31,10 @@ export async function POST(request: NextRequest) {
       const otp = generateOTP();
       const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
-      // Create user
-      const result = await client.query(
-        `INSERT INTO users (email, phone, otp_code, otp_expires_at) 
-         VALUES ($1, $2, $3, $4) 
-         RETURNING id, email`,
-        [email, phone, otp, otpExpiresAt]
+      // Update user with OTP
+      await client.query(
+        'UPDATE users SET otp_code = $1, otp_expires_at = $2 WHERE email = $3',
+        [otp, otpExpiresAt, email]
       );
 
       // Send OTP email
@@ -52,15 +48,15 @@ export async function POST(request: NextRequest) {
         {
           success: true,
           message: 'OTP sent to your email',
-          userId: result.rows[0].id,
+          userId: userResult.rows[0].id,
         },
-        { status: 201 }
+        { status: 200 }
       );
     } finally {
       client.release();
     }
   } catch (error) {
-    console.error('Signup error:', error);
+    console.error('Login error:', error);
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: error.errors[0].message },
