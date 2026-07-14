@@ -1,5 +1,5 @@
 import { pool } from './db';
-import { calculateGasFee, deductGasFee } from './gas-fee-service';
+import { calculateGasFee, recordGasFee } from './gas-fee-service';
 import { ethers } from 'ethers';
 
 const HOT_WALLET_ADDRESS = process.env.HOT_WALLET_ADDRESS;
@@ -31,8 +31,8 @@ export async function createSweepTask(
 
     const taskId = result.rows[0].id;
 
-    // Deduct gas fee from user balance
-    await deductGasFee(userId, taskId, gasFee);
+    // Record gas fee (paid from hot wallet, not deducted from user balance)
+    await recordGasFee(userId, taskId, gasFee);
 
     client.release();
 

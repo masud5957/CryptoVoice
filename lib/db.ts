@@ -109,6 +109,22 @@ export async function initializeDatabase() {
       );
     `);
 
+    // Create balance_ledger table for tracking all balance changes
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS balance_ledger (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        transaction_type VARCHAR(50) NOT NULL,
+        amount DECIMAL(18, 8) NOT NULL,
+        balance_before DECIMAL(18, 8) NOT NULL,
+        balance_after DECIMAL(18, 8) NOT NULL,
+        description TEXT,
+        related_id INTEGER,
+        related_type VARCHAR(50),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
     console.log('Database initialized successfully');
   } catch (error) {
     console.error('Error initializing database:', error);

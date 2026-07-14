@@ -25,7 +25,7 @@ export async function calculateGasFee(amount: number): Promise<number> {
   return Math.round(gasFee * 100000000) / 100000000;
 }
 
-export async function deductGasFee(
+export async function recordGasFee(
   userId: number,
   sweepTaskId: number,
   gasFeeAmount: number
@@ -34,25 +34,19 @@ export async function deductGasFee(
   try {
     client = await pool.connect();
 
-    // Update user balance
-    await client.query(
-      'UPDATE users SET balance = balance - $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2',
-      [gasFeeAmount, userId]
-    );
-
-    // Record gas fee deduction
+    // Record gas fee (paid from hot wallet, not from user balance)
     await client.query(
       `INSERT INTO gas_fees (user_id, sweep_task_id, amount, deducted_from_balance)
-       VALUES ($1, $2, $3, TRUE)`,
+       VALUES ($1, $2, $3, FALSE)`,
       [userId, sweepTaskId, gasFeeAmount]
     );
 
-    console.log('[v0] Gas fee deducted - User:', userId, 'Amount:', gasFeeAmount);
+    console.log('[v0] Gas fee recorded - User:', userId, 'Amount:', gasFeeAmount, 'Paid from hot wallet');
     client.release();
     return true;
   } catch (error) {
     if (client) client.release();
-    console.error('[v0] Error deducting gas fee:', error);
+    console.error('[v0] Error recording gas fee:', error);
     return false;
   }
 }
