@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Copy, AlertCircle, CheckCircle, Clock, User, Settings, LogOut, ChevronDown, Plus, Wallet, X, Landmark, Edit2, Trash2 } from 'lucide-react';
 import { DepositPanel } from './DepositPanel';
@@ -56,6 +57,7 @@ export function Dashboard({ onLogout }: DashboardProps) {
   const [currentView, setCurrentView] = useState<DashboardView>('main');
   const [showAddWallet, setShowAddWallet] = useState(false);
   const [editingWallet, setEditingWallet] = useState<Wallet | null>(null);
+  const depositSectionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchDashboard();
@@ -251,17 +253,70 @@ export function Dashboard({ onLogout }: DashboardProps) {
           <div className="space-y-6">
 
       {/* Balance Card */}
-      <div className="bg-white border-2 border-gray-200 rounded-lg p-6">
-        <h2 className="text-gray-600 font-medium mb-2">Current Balance</h2>
-        <div className="flex items-baseline gap-2">
-          <span className="text-4xl font-bold text-amber-600">${user.balance.toFixed(2)}</span>
-          <span className="text-gray-500">USDT</span>
+      <div className="bg-gradient-to-br from-amber-50 to-amber-100 border-2 border-amber-200 rounded-lg p-6">
+        <div className="flex items-start justify-between mb-4">
+          <div>
+            <h2 className="text-gray-600 font-medium mb-2">Current Balance</h2>
+            <div className="flex items-baseline gap-2">
+              <span className="text-4xl font-bold text-amber-600">${user.balance.toFixed(2)}</span>
+              <span className="text-gray-500">USDT</span>
+            </div>
+            <p className="text-sm text-gray-600 mt-2">
+              {hasMinimumBalance
+                ? '✓ Minimum balance requirement met'
+                : `⚠ Need $${(500 - user.balance).toFixed(2)} USDT more`}
+            </p>
+          </div>
         </div>
-        <p className="text-sm text-gray-500 mt-2">
-          {hasMinimumBalance
-            ? '✓ Minimum balance requirement met'
-            : `⚠ Need $${(500 - user.balance).toFixed(2)} USDT more`}
-        </p>
+        <button
+          onClick={() => {
+            depositSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }}
+          className="w-full py-3 px-4 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors font-medium mt-4"
+        >
+          Deposit USDT
+        </button>
+      </div>
+
+      {/* System Wallet Deposit Section */}
+      <div ref={depositSectionRef} className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-300 rounded-lg p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Landmark className="w-6 h-6 text-green-600" />
+          <h3 className="text-lg font-semibold text-gray-800">CryptoVoice Deposit Address</h3>
+        </div>
+        
+        <div className="bg-white border border-gray-300 rounded-lg p-4 mb-4">
+          <p className="text-xs text-gray-500 mb-2 font-semibold uppercase">Your BEP20 Deposit Address</p>
+          <p className="text-sm font-mono text-gray-800 break-all mb-3">{user.deposit_address}</p>
+          <button
+            onClick={() => {
+              navigator.clipboard.writeText(user.deposit_address);
+              alert('Address copied to clipboard');
+            }}
+            className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-sm"
+          >
+            <Copy className="w-4 h-4" />
+            Copy Address
+          </button>
+        </div>
+
+        {/* QR Code Section */}
+        <div className="bg-white border border-gray-300 rounded-lg p-6 text-center">
+          <p className="text-sm text-gray-600 mb-3">Scan to deposit</p>
+          <div className="inline-block">
+            {/* QR code will be generated here */}
+            <div className="w-40 h-40 bg-gray-100 flex items-center justify-center rounded">
+              <p className="text-xs text-gray-500">QR Code Loading...</p>
+            </div>
+          </div>
+          <p className="text-xs text-gray-500 mt-3">Minimum deposit: 500 USDT</p>
+        </div>
+
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
+          <p className="text-sm text-blue-800">
+            <strong>Note:</strong> Send only BEP20 (BSC) tokens to this address. Other networks or currencies will not be credited.
+          </p>
+        </div>
       </div>
 
       {/* Connected Wallets Card */}
