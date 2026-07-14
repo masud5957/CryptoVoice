@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Copy, AlertCircle, CheckCircle, Clock, User, Settings, LogOut, ChevronDown, Plus } from 'lucide-react';
+import { Copy, AlertCircle, CheckCircle, Clock, User, Settings, LogOut, ChevronDown, Plus, Wallet, X, Landmark } from 'lucide-react';
 import { DepositPanel } from './DepositPanel';
 import { ProfilePage } from './ProfilePage';
 import { SettingsPage } from './SettingsPage';
@@ -24,9 +24,18 @@ interface Deposit {
   created_at: string;
 }
 
+interface Wallet {
+  id: number;
+  wallet_type: string;
+  trc20_address: string;
+  is_active: boolean;
+  created_at: string;
+}
+
 interface DashboardData {
   user: User;
   deposits: Deposit[];
+  wallets: Wallet[];
 }
 
 interface DashboardProps {
@@ -253,9 +262,29 @@ export function Dashboard({ onLogout }: DashboardProps) {
         </p>
       </div>
 
-      {/* Add Wallet Card */}
-      <div className="bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-200 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-gray-800 mb-3">Connected Wallets</h3>
+      {/* Connected Wallets Card */}
+      <div className="bg-white border-2 border-gray-200 rounded-lg p-6">
+        <h3 className="text-lg font-semibold text-gray-800 mb-4">Connected Wallets</h3>
+        
+        {data?.wallets && data.wallets.length > 0 ? (
+          <div className="space-y-3 mb-4">
+            {data.wallets.map((wallet) => (
+              <div key={wallet.id} className="flex items-center justify-between p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="flex items-center gap-3 flex-1 min-w-0">
+                  <Landmark className="w-5 h-5 text-blue-600 flex-shrink-0" />
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium text-gray-800">{wallet.wallet_type}</p>
+                    <p className="text-sm text-gray-600 truncate">{wallet.trc20_address}</p>
+                  </div>
+                </div>
+                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-gray-500 mb-4">No wallets connected yet</p>
+        )}
+
         <button
           onClick={() => setShowAddWallet(true)}
           className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"

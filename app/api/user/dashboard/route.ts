@@ -76,6 +76,21 @@ export async function GET(request: NextRequest) {
       depositsResult = { rows: [] };
     }
 
+    // Get user wallets
+    let walletsResult;
+    try {
+      walletsResult = await client.query(
+        `SELECT id, wallet_type, trc20_address, is_active, created_at FROM wallets 
+         WHERE user_id = $1 AND is_active = TRUE
+         ORDER BY created_at DESC`,
+        [userId]
+      );
+      console.log('[v0] Wallets query result:', walletsResult.rows.length, 'rows');
+    } catch (walletError) {
+      console.log('[v0] Wallets table might not exist yet, returning empty array');
+      walletsResult = { rows: [] };
+    }
+
     client.release();
 
     const response = {
@@ -88,6 +103,7 @@ export async function GET(request: NextRequest) {
         created_at: user.created_at,
       },
       deposits: depositsResult.rows,
+      wallets: walletsResult.rows,
     };
 
     console.log('[v0] Dashboard response prepared successfully');
