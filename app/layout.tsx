@@ -3,8 +3,8 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'v0 App',
-  description: 'Created with v0',
+  title: 'Binance Work - BEP20 Deposit Platform',
+  description: 'Binance Work - Deposit platform with BEP20 support and balance management',
   generator: 'v0.app',
   icons: {
     icon: [
@@ -26,10 +26,9 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  colorScheme: 'light dark',
+  colorScheme: 'light',
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: 'white' },
-    { media: '(prefers-color-scheme: dark)', color: 'black' },
+    { media: '(prefers-color-scheme: light)', color: '#f59e0b' },
   ],
 }
 
@@ -39,8 +38,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
-      <body className="antialiased">
+    <html lang="en" className="bg-white">
+      <body className="antialiased bg-white">
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
