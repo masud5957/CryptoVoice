@@ -45,24 +45,23 @@ export default function Page() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      {/* Header */}
-      <div className="bg-white border-b sticky top-0 z-40">
-        <div className="max-w-md mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-amber-600">CryptoVoice</h1>
-          {isAuthenticated && (
+      {/* Header - Logout Button */}
+      {isAuthenticated && (
+        <div className="bg-white border-b sticky top-0 z-40">
+          <div className="max-w-md mx-auto px-4 py-3 flex justify-end">
             <button
               onClick={() => {
                 setIsAuthenticated(false);
                 setState('auth');
                 setEmail('');
               }}
-              className="text-sm text-gray-600 hover:text-gray-900 px-3 py-1 rounded hover:bg-gray-100"
+              className="text-sm text-gray-600 hover:text-gray-900 px-3 py-2 rounded hover:bg-gray-100"
             >
               Logout
             </button>
-          )}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Main Content */}
       {isAuthenticated ? (
