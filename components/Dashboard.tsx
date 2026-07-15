@@ -399,7 +399,7 @@ export function Dashboard({ onLogout }: DashboardProps) {
             <ul className="space-y-2">
               <li className="flex items-start gap-2 text-xs text-gray-700">
                 <span className="text-blue-600 font-bold">•</span>
-                <span><strong>Wallet validity upto 30 days</strong> - Your connected wallet will be active for 30 days of earning</span>
+                <span><strong>Wallet validity upto 30 days(Binance, TrustWallet, etc...)</strong> - Your connected wallet will be active for 30 days of earning</span>
               </li>
               <li className="flex items-start gap-2 text-xs text-gray-700">
                 <span className="text-blue-600 font-bold">•</span>
