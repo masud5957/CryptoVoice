@@ -641,11 +641,14 @@ export function Dashboard({ onLogout }: DashboardProps) {
             <div className="bg-sky-50 rounded-lg p-6 border border-sky-200">
               <h3 className="font-semibold text-gray-900 mb-3">Join Our Community</h3>
               <p className="text-sm text-gray-600 mb-4">Get the latest updates and connect with other users</p>
-              <button 
+              <a 
+                href="https://t.me/cryptovoicework"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-4 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700 transition-colors font-medium text-sm"
               >
                 Join Telegram Channel
-              </button>
+              </a>
             </div>
           </div>
         </div>
