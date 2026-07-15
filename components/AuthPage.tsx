@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Mail, ArrowRight, CheckCircle, Lock, Eye, EyeOff } from 'lucide-react';
+import { CheckCircle } from 'lucide-react';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 
 interface AuthPageProps {
@@ -183,6 +184,18 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm-5-9h10v2H7z" />
               </svg>
             </div>
+            
+            {/* USDT Logo */}
+            <div className="mb-6 flex justify-center">
+              <Image 
+                src="/usdt-logo.png" 
+                alt="USDT Logo" 
+                width={64} 
+                height={64}
+                className="rounded-full shadow-lg"
+              />
+            </div>
+            
             <h1 className="text-5xl font-black text-gray-900 mb-3 tracking-tight">CryptoVoice</h1>
             <p className="text-xl text-blue-600 mb-2 font-semibold">Automated Crypto Trading Platform</p>
             <p className="text-sm text-gray-600 mb-6 font-medium">Connect Binance, Trust Wallet & More</p>
