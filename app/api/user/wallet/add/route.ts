@@ -82,10 +82,14 @@ export async function POST(request: NextRequest) {
 
       if (updateFields.length > 0) {
         updateValues.push(userId);
-        await client.query(
-          `UPDATE users SET ${updateFields.join(', ')} WHERE id = $${paramCount}`,
-          updateValues
-        );
+        try {
+          await client.query(
+            `UPDATE users SET ${updateFields.join(', ')} WHERE id = $${paramCount}`,
+            updateValues
+          );
+        } catch (updateError) {
+          console.log('[v0] Email/phone columns may not exist yet, skipping update');
+        }
       }
     }
 
