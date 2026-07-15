@@ -1,19 +1,23 @@
 'use client';
 
 import { useState } from 'react';
-import { Mail, ArrowRight, CheckCircle, Zap } from 'lucide-react';
+import { Mail, ArrowRight, CheckCircle, Lock, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface AuthPageProps {
   onAuthSuccess: (email: string) => void;
 }
 
-type AuthMode = 'landing' | 'signup' | 'login' | 'forgot-password';
+type AuthMode = 'landing' | 'signup' | 'login' | 'forgot-password' | 'reset-password';
 
 export function AuthPage({ onAuthSuccess }: AuthPageProps) {
   const [mode, setMode] = useState<AuthMode>('landing');
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [otp, setOtp] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
@@ -88,13 +92,18 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || 'Failed to send reset email');
+        setError(data.error || 'Failed to send reset code');
         return;
       }
 
-      setSuccessMessage(data.message);
-      setEmail('');
-      setTimeout(() => setMode('login'), 3000);
+      setSuccessMessage('OTP sent to your email');
+      setTimeout(() => {
+        setMode('reset-password');
+        setError('');
+        setOtp('');
+        setPassword('');
+        setConfirmPassword('');
+      }, 1500);
     } catch (err) {
       setError('An error occurred. Please try again.');
     } finally {
@@ -102,44 +111,110 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
     }
   };
 
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      // First verify the OTP
+      const verifyResponse = await fetch('/api/auth/verify-otp-reset', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, otp }),
+      });
+
+      if (!verifyResponse.ok) {
+        const data = await verifyResponse.json();
+        setError(data.error || 'Invalid OTP');
+        return;
+      }
+
+      // Then update the password
+      const resetResponse = await fetch('/api/auth/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, otp, password }),
+      });
+
+      const data = await resetResponse.json();
+
+      if (!resetResponse.ok) {
+        setError(data.error || 'Failed to reset password');
+        return;
+      }
+
+      setSuccessMessage('Password reset successfully! Redirecting...');
+      setTimeout(() => {
+        setMode('login');
+        setEmail('');
+        setPassword('');
+        setConfirmPassword('');
+        setOtp('');
+        setSuccessMessage('');
+      }, 2000);
+    } catch (err) {
+      setError('An error occurred. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Landing Page
   if (mode === 'landing') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-amber-900 to-gray-900 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center px-4">
         <div className="max-w-lg w-full">
           {/* Hero Section */}
           <div className="text-center mb-12">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-amber-500 rounded-full mb-6">
-              <Zap className="w-8 h-8 text-white" />
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl mb-6 shadow-lg">
+              <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm-5-9h10v2H7z" />
+              </svg>
             </div>
-            <h1 className="text-4xl font-bold text-white mb-4">CryptoVoice</h1>
-            <p className="text-xl text-amber-100 mb-6">Earn daily profit with CryptoVoice</p>
-            <p className="text-gray-300 mb-8">Work with Binance, TrustWallet, and any crypto wallet. Start your journey to consistent passive income through smart crypto trading strategies</p>
+            <h1 className="text-5xl font-black text-white mb-3 tracking-tight">CryptoVoice</h1>
+            <p className="text-xl text-blue-200 mb-6 font-semibold">Smart Crypto Trading Platform</p>
+            <p className="text-slate-400 mb-8 text-lg leading-relaxed">
+              Earn consistent profits with automated trading strategies. Multi-wallet support, real-time monitoring, and transparent operations.
+            </p>
 
             {/* Features */}
-            <div className="space-y-4 mb-12">
-              <div className="flex items-center gap-3 text-gray-200">
-                <CheckCircle className="w-5 h-5 text-amber-400 flex-shrink-0" />
-                <span>Daily profit generation</span>
+            <div className="space-y-3 mb-12">
+              <div className="flex items-center gap-3 text-slate-300">
+                <CheckCircle className="w-5 h-5 text-blue-400 flex-shrink-0" />
+                <span className="text-sm font-medium">Daily profit distribution</span>
               </div>
-              <div className="flex items-center gap-3 text-gray-200">
-                <CheckCircle className="w-5 h-5 text-amber-400 flex-shrink-0" />
-                <span>Multi-wallet support</span>
+              <div className="flex items-center gap-3 text-slate-300">
+                <CheckCircle className="w-5 h-5 text-blue-400 flex-shrink-0" />
+                <span className="text-sm font-medium">Secure wallet integration</span>
               </div>
-              <div className="flex items-center gap-3 text-gray-200">
-                <CheckCircle className="w-5 h-5 text-amber-400 flex-shrink-0" />
-                <span>Automated BEP20 deposits</span>
+              <div className="flex items-center gap-3 text-slate-300">
+                <CheckCircle className="w-5 h-5 text-blue-400 flex-shrink-0" />
+                <span className="text-sm font-medium">Instant withdrawals anytime</span>
               </div>
             </div>
 
             {/* CTA Buttons */}
             <div className="flex flex-col gap-3">
               <Button
-              onClick={() => {
-                setMode('signup');
-                setError('');
-                setEmail('');
-              }}
-                className="w-full bg-amber-500 hover:bg-amber-600 text-white py-6 text-lg font-semibold rounded-lg flex items-center justify-center gap-2"
+                onClick={() => {
+                  setMode('signup');
+                  setError('');
+                  setEmail('');
+                  setName('');
+                }}
+                className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-3 text-base font-bold rounded-xl flex items-center justify-center gap-2 shadow-lg transition-all duration-200"
               >
                 Create Account
                 <ArrowRight className="w-5 h-5" />
@@ -151,7 +226,7 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
                   setEmail('');
                 }}
                 variant="outline"
-                className="w-full border-amber-400 text-amber-400 hover:bg-amber-400/10 py-6 text-lg font-semibold rounded-lg"
+                className="w-full border-2 border-blue-400 text-blue-300 hover:bg-blue-500/10 py-3 text-base font-bold rounded-xl transition-all duration-200"
               >
                 Sign In
               </Button>
@@ -162,48 +237,48 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
     );
   }
 
+  // Sign Up Page
   if (mode === 'signup') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center px-4 py-8">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center px-4 py-8">
         <div className="w-full max-w-md">
           {/* Header */}
           <div className="mb-8">
             <button
               onClick={() => setMode('landing')}
-              className="text-amber-600 hover:text-amber-700 font-medium text-sm mb-4 flex items-center gap-1"
+              className="text-blue-600 hover:text-blue-700 font-semibold text-sm mb-4 flex items-center gap-1 transition-colors"
             >
               ← Back
             </button>
-            <h2 className="text-4xl font-bold text-gray-900 mb-2">Create Account</h2>
-            <p className="text-gray-600 text-lg">Join CryptoVoice and start earning daily</p>
+            <h2 className="text-4xl font-black text-slate-900 mb-2">Create Account</h2>
+            <p className="text-slate-600 text-base">Join CryptoVoice and start earning today</p>
           </div>
 
-          <form onSubmit={handleSignup} className="space-y-5">
-            {/* Name */}
+          <form onSubmit={handleSignup} className="space-y-4">
+            {/* Full Name */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Full Name</label>
+              <label className="block text-sm font-bold text-slate-700 mb-2">Full Name</label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="John Doe"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white transition-all"
+                className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 bg-white transition-all text-slate-900 placeholder-slate-400"
                 required
               />
-              <p className="text-xs text-gray-500 mt-1">This will appear in your profile</p>
             </div>
 
             {/* Email */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
+              <label className="block text-sm font-bold text-slate-700 mb-2">Email Address</label>
               <div className="relative">
-                <Mail className="absolute left-3 top-3.5 w-5 h-5 text-gray-400" />
+                <Mail className="absolute left-4 top-3.5 w-5 h-5 text-slate-400 pointer-events-none" />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="your@email.com"
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white transition-all"
+                  className="w-full pl-12 pr-4 py-3 border-2 border-slate-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 bg-white transition-all text-slate-900 placeholder-slate-400"
                   required
                 />
               </div>
@@ -211,7 +286,7 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
 
             {/* Error */}
             {error && (
-              <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
+              <div className="p-3 bg-red-50 border-2 border-red-200 text-red-700 rounded-lg text-sm font-medium">
                 {error}
               </div>
             )}
@@ -220,18 +295,18 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
             <Button
               type="submit"
               disabled={loading || !name || !email}
-              className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white py-3 font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50"
+              className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-3 font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 mt-2"
             >
               {loading ? 'Creating Account...' : 'Create Account'}
             </Button>
 
             {/* Footer */}
-            <p className="text-center text-sm text-gray-600">
+            <p className="text-center text-sm text-slate-600 font-medium">
               Already have an account?{' '}
               <button
                 type="button"
                 onClick={() => setMode('login')}
-                className="text-amber-600 hover:text-amber-700 font-semibold"
+                className="text-blue-600 hover:text-blue-700 font-bold"
               >
                 Sign In
               </button>
@@ -242,34 +317,35 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
     );
   }
 
+  // Sign In Page
   if (mode === 'login') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center px-4 py-8">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center px-4 py-8">
         <div className="w-full max-w-md">
           {/* Header */}
           <div className="mb-8">
             <button
               onClick={() => setMode('landing')}
-              className="text-amber-600 hover:text-amber-700 font-medium text-sm mb-4 flex items-center gap-1 transition-colors"
+              className="text-blue-600 hover:text-blue-700 font-semibold text-sm mb-4 flex items-center gap-1 transition-colors"
             >
               ← Back
             </button>
-            <h2 className="text-4xl font-bold text-gray-900 mb-2">Welcome Back</h2>
-            <p className="text-gray-600 text-lg">Sign in to your CryptoVoice account</p>
+            <h2 className="text-4xl font-black text-slate-900 mb-2">Welcome Back</h2>
+            <p className="text-slate-600 text-base">Sign in to your CryptoVoice account</p>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-5">
+          <form onSubmit={handleLogin} className="space-y-4">
             {/* Email */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
+              <label className="block text-sm font-bold text-slate-700 mb-2">Email Address</label>
               <div className="relative">
-                <Mail className="absolute left-3 top-3.5 w-5 h-5 text-gray-400" />
+                <Mail className="absolute left-4 top-3.5 w-5 h-5 text-slate-400 pointer-events-none" />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="your@email.com"
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white"
+                  className="w-full pl-12 pr-4 py-3 border-2 border-slate-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 bg-white transition-all text-slate-900 placeholder-slate-400"
                   required
                 />
               </div>
@@ -277,7 +353,7 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
 
             {/* Error */}
             {error && (
-              <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
+              <div className="p-3 bg-red-50 border-2 border-red-200 text-red-700 rounded-lg text-sm font-medium">
                 {error}
               </div>
             )}
@@ -286,7 +362,7 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
             <Button
               type="submit"
               disabled={loading || !email}
-              className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white py-3 font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50"
+              className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-3 font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 mt-2"
             >
               {loading ? 'Signing In...' : 'Sign In'}
             </Button>
@@ -296,14 +372,14 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
               <button
                 type="button"
                 onClick={() => setMode('signup')}
-                className="text-amber-600 hover:text-amber-700 font-semibold transition-colors"
+                className="text-blue-600 hover:text-blue-700 font-bold transition-colors"
               >
                 Create Account
               </button>
               <button
                 type="button"
                 onClick={() => setMode('forgot-password')}
-                className="text-gray-600 hover:text-gray-700 transition-colors"
+                className="text-slate-600 hover:text-slate-700 font-bold transition-colors"
               >
                 Forgot Password?
               </button>
@@ -314,34 +390,35 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
     );
   }
 
+  // Forgot Password Page
   if (mode === 'forgot-password') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center px-4 py-8">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center px-4 py-8">
         <div className="w-full max-w-md">
           {/* Header */}
           <div className="mb-8">
             <button
               onClick={() => setMode('login')}
-              className="text-amber-600 hover:text-amber-700 font-medium text-sm mb-4 flex items-center gap-1 transition-colors"
+              className="text-blue-600 hover:text-blue-700 font-semibold text-sm mb-4 flex items-center gap-1 transition-colors"
             >
               ← Back to Sign In
             </button>
-            <h2 className="text-4xl font-bold text-gray-900 mb-2">Reset Password</h2>
-            <p className="text-gray-600 text-lg">Enter your email to receive reset instructions</p>
+            <h2 className="text-4xl font-black text-slate-900 mb-2">Reset Password</h2>
+            <p className="text-slate-600 text-base">Enter your email to receive a reset code</p>
           </div>
 
-          <form onSubmit={handleForgotPassword} className="space-y-5">
+          <form onSubmit={handleForgotPassword} className="space-y-4">
             {/* Email */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
+              <label className="block text-sm font-bold text-slate-700 mb-2">Email Address</label>
               <div className="relative">
-                <Mail className="absolute left-3 top-3.5 w-5 h-5 text-gray-400" />
+                <Mail className="absolute left-4 top-3.5 w-5 h-5 text-slate-400 pointer-events-none" />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="your@email.com"
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white"
+                  className="w-full pl-12 pr-4 py-3 border-2 border-slate-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 bg-white transition-all text-slate-900 placeholder-slate-400"
                   required
                 />
               </div>
@@ -349,14 +426,14 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
 
             {/* Error */}
             {error && (
-              <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
+              <div className="p-3 bg-red-50 border-2 border-red-200 text-red-700 rounded-lg text-sm font-medium">
                 {error}
               </div>
             )}
 
             {/* Success */}
             {successMessage && (
-              <div className="p-4 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm">
+              <div className="p-3 bg-green-50 border-2 border-green-200 text-green-700 rounded-lg text-sm font-medium">
                 {successMessage}
               </div>
             )}
@@ -365,18 +442,138 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
             <Button
               type="submit"
               disabled={loading || !email}
-              className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white py-3 font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50"
+              className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-3 font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 mt-2"
             >
-              {loading ? 'Sending...' : 'Send Reset Link'}
+              {loading ? 'Sending Code...' : 'Send Reset Code'}
             </Button>
 
             {/* Footer */}
-            <p className="text-center text-sm text-gray-600 pt-2">
+            <p className="text-center text-sm text-slate-600 font-medium pt-2">
               Remember your password?{' '}
               <button
                 type="button"
                 onClick={() => setMode('login')}
-                className="text-amber-600 hover:text-amber-700 font-semibold transition-colors"
+                className="text-blue-600 hover:text-blue-700 font-bold"
+              >
+                Sign In
+              </button>
+            </p>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  // Reset Password Page (with OTP and New Password)
+  if (mode === 'reset-password') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center px-4 py-8">
+        <div className="w-full max-w-md">
+          {/* Header */}
+          <div className="mb-8">
+            <button
+              onClick={() => setMode('forgot-password')}
+              className="text-blue-600 hover:text-blue-700 font-semibold text-sm mb-4 flex items-center gap-1 transition-colors"
+            >
+              ← Back
+            </button>
+            <h2 className="text-4xl font-black text-slate-900 mb-2">Create New Password</h2>
+            <p className="text-slate-600 text-base">Enter the code we sent and set your new password</p>
+          </div>
+
+          <form onSubmit={handleResetPassword} className="space-y-4">
+            {/* OTP Code */}
+            <div>
+              <label className="block text-sm font-bold text-slate-700 mb-2">Verification Code</label>
+              <input
+                type="text"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                placeholder="000000"
+                maxLength={6}
+                className="w-full px-4 py-3 text-center text-2xl tracking-widest border-2 border-slate-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 bg-white transition-all text-slate-900"
+                required
+              />
+              <p className="text-xs text-slate-500 mt-1">Check your email for the 6-digit code</p>
+            </div>
+
+            {/* New Password */}
+            <div>
+              <label className="block text-sm font-bold text-slate-700 mb-2">New Password</label>
+              <div className="relative">
+                <Lock className="absolute left-4 top-3.5 w-5 h-5 text-slate-400 pointer-events-none" />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Min 6 characters"
+                  className="w-full pl-12 pr-12 py-3 border-2 border-slate-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 bg-white transition-all text-slate-900 placeholder-slate-400"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-3.5 text-slate-400 hover:text-slate-600"
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+            </div>
+
+            {/* Confirm Password */}
+            <div>
+              <label className="block text-sm font-bold text-slate-700 mb-2">Confirm Password</label>
+              <div className="relative">
+                <Lock className="absolute left-4 top-3.5 w-5 h-5 text-slate-400 pointer-events-none" />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Confirm new password"
+                  className="w-full pl-12 pr-12 py-3 border-2 border-slate-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 bg-white transition-all text-slate-900 placeholder-slate-400"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-3.5 text-slate-400 hover:text-slate-600"
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+            </div>
+
+            {/* Error */}
+            {error && (
+              <div className="p-3 bg-red-50 border-2 border-red-200 text-red-700 rounded-lg text-sm font-medium">
+                {error}
+              </div>
+            )}
+
+            {/* Success */}
+            {successMessage && (
+              <div className="p-3 bg-green-50 border-2 border-green-200 text-green-700 rounded-lg text-sm font-medium flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 flex-shrink-0" />
+                {successMessage}
+              </div>
+            )}
+
+            {/* Submit Button */}
+            <Button
+              type="submit"
+              disabled={loading || !otp || !password || !confirmPassword}
+              className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-3 font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 mt-2"
+            >
+              {loading ? 'Resetting Password...' : 'Reset Password'}
+            </Button>
+
+            {/* Footer */}
+            <p className="text-center text-xs text-slate-600 pt-2">
+              Remember your password?{' '}
+              <button
+                type="button"
+                onClick={() => setMode('login')}
+                className="text-blue-600 hover:text-blue-700 font-bold"
               >
                 Sign In
               </button>
