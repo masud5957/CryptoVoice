@@ -210,28 +210,6 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
               </div>
             </div>
 
-            {/* Additional Benefits */}
-            <div className="bg-blue-50 rounded-lg p-6 mb-8 border border-blue-100">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="text-left">
-                  <h4 className="font-semibold text-gray-900 mb-1">Binance Integration</h4>
-                  <p className="text-xs text-gray-600">Direct connection to Binance API for seamless trading</p>
-                </div>
-                <div className="text-left">
-                  <h4 className="font-semibold text-gray-900 mb-1">Trust Wallet Support</h4>
-                  <p className="text-xs text-gray-600">Secure wallet connectivity for decentralized trading</p>
-                </div>
-                <div className="text-left">
-                  <h4 className="font-semibold text-gray-900 mb-1">Real-Time Monitoring</h4>
-                  <p className="text-xs text-gray-600">24/7 automated trading strategies tracking</p>
-                </div>
-                <div className="text-left">
-                  <h4 className="font-semibold text-gray-900 mb-1">Profit Sharing</h4>
-                  <p className="text-xs text-gray-600">Daily profits distributed to your wallet automatically</p>
-                </div>
-              </div>
-            </div>
-
             {/* CTA Buttons */}
             <div className="flex flex-col gap-3">
               <Button
