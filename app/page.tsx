@@ -68,18 +68,22 @@ export default function Page() {
           }}
         />
       ) : (
-        <div className="max-w-md mx-auto px-4 py-8">
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-2xl font-bold mb-2">Verify Email</h2>
-            <p className="text-gray-600 mb-6">Enter the OTP code sent to your email</p>
-            <OTPVerification
-              email={email}
-              onSuccess={() => {
-                setIsAuthenticated(true);
-                setState('dashboard');
-              }}
-              onBack={() => setState('auth')}
-            />
+        <div className="min-h-screen flex items-center justify-center px-4 py-8">
+          <div className="w-full max-w-md">
+            <div className="bg-white rounded-xl shadow-xl p-8 space-y-6">
+              <div className="text-center space-y-2">
+                <h1 className="text-3xl font-bold text-gray-900">Verify Your Email</h1>
+                <p className="text-gray-600">Enter the verification code we sent to your inbox</p>
+              </div>
+              <OTPVerification
+                email={email}
+                onSuccess={() => {
+                  setIsAuthenticated(true);
+                  setState('dashboard');
+                }}
+                onBack={() => setState('auth')}
+              />
+            </div>
           </div>
         </div>
       )}

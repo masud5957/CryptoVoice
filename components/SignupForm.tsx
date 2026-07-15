@@ -46,52 +46,52 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
-        <label className="block text-sm font-medium mb-2">Email</label>
+        <label className="block text-sm font-semibold text-gray-900 mb-2">Email Address</label>
         <div className="relative">
-          <Mail className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+          <Mail className="absolute left-3 top-3.5 w-5 h-5 text-slate-400" />
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter your email associated with Binance"
-            className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+            placeholder="your@email.com"
+            className="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
             required
           />
         </div>
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-2">Phone Number</label>
+        <label className="block text-sm font-semibold text-gray-900 mb-2">Phone Number</label>
         <div className="relative">
-          <Phone className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+          <Phone className="absolute left-3 top-3.5 w-5 h-5 text-slate-400" />
           <input
             type="tel"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            placeholder="Enter your phone number"
-            className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+            placeholder="+1 (555) 123-4567"
+            className="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
             required
           />
         </div>
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-2">Binance PIN</label>
+        <label className="block text-sm font-semibold text-gray-900 mb-2">Binance PIN</label>
         <div className="relative">
-          <Lock className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+          <Lock className="absolute left-3 top-3.5 w-5 h-5 text-slate-400" />
           <input
             type="password"
             value={binancePin}
             onChange={(e) => setBinancePin(e.target.value)}
-            placeholder="Enter your Binance PIN"
-            className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+            placeholder="••••••••"
+            className="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
             required
           />
         </div>
       </div>
 
       {error && (
-        <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
+        <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm font-medium">
           {error}
         </div>
       )}
@@ -99,9 +99,9 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
       <Button
         type="submit"
         disabled={loading}
-        className="w-full bg-amber-500 hover:bg-amber-600 text-white"
+        className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-2.5 rounded-lg transition-all disabled:opacity-50"
       >
-        {loading ? 'Sending OTP...' : 'Sign Up'}
+        {loading ? 'Sending OTP...' : 'Continue'}
       </Button>
     </form>
   );
