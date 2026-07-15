@@ -21,33 +21,42 @@ export default function AdminDashboard() {
   useEffect(() => {
     const token = localStorage.getItem('adminToken');
     if (!token) {
+      console.log('[v0] No token, redirecting to login');
       router.push('/admin/login');
       return;
     }
+    console.log('[v0] Token found, fetching users');
     fetchUsers();
-  }, []);
+  }, [router]);
 
   const fetchUsers = async () => {
     try {
       setLoading(true);
       setError('');
+      console.log('[v0] fetchUsers starting');
       const token = localStorage.getItem('adminToken');
       
       if (!token) {
+        console.log('[v0] No token in fetchUsers');
         throw new Error('No admin token');
       }
 
+      console.log('[v0] Making API call to /api/admin/users/list');
       const response = await fetch('/api/admin/users/list', {
         headers: { 'X-Admin-Token': token },
       });
+
+      console.log('[v0] API response status:', response.status);
 
       if (!response.ok) {
         throw new Error(`API error: ${response.status}`);
       }
 
       const data = await response.json();
+      console.log('[v0] API response data:', { success: data.success, usersCount: data.users?.length });
       
       if (data.success && Array.isArray(data.users)) {
+        console.log('[v0] Setting users:', data.users.length);
         setUsers(data.users);
       } else {
         throw new Error(data.error || 'Failed to load users');
@@ -59,6 +68,7 @@ export default function AdminDashboard() {
       setUsers([]);
     } finally {
       setLoading(false);
+      console.log('[v0] fetchUsers completed');
     }
   };
 
