@@ -201,9 +201,10 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
             <h1 className="text-5xl font-black text-gray-900 mb-3 tracking-tight">CryptoVoice</h1>
             <p className="text-xl text-blue-600 mb-2 font-semibold">Automated Crypto Trading Platform</p>
             <p className="text-sm text-gray-600 mb-6 font-medium">Connect Binance, Trust Wallet & More</p>
-            <p className="text-gray-700 mb-8 text-lg leading-relaxed font-medium">
+            <p className="text-gray-700 mb-2 text-lg leading-relaxed font-medium">
               Earn consistent profits with automated trading strategies. Multi-wallet support for Binance and Trust Wallet, real-time monitoring, and transparent operations.
             </p>
+            <p className="text-blue-600 mb-8 text-lg font-bold">Earn Commission Upto 5% Daily</p>
 
             {/* Features */}
             <div className="space-y-3 mb-12">
