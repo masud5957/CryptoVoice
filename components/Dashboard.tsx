@@ -609,6 +609,36 @@ export function Dashboard({ onLogout }: DashboardProps) {
         )}
       </div>
 
+      {/* Footer - Contact & Telegram */}
+      {currentView === 'main' && (
+        <div className="mt-12 border-t border-gray-200 pt-8 pb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Contact Section */}
+            <div className="bg-blue-50 rounded-lg p-6 border border-blue-200">
+              <h3 className="font-semibold text-gray-900 mb-3">Need Help?</h3>
+              <p className="text-sm text-gray-600 mb-4">Contact our support team for any assistance</p>
+              <a 
+                href="mailto:support@cryptovoicework.com"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
+              >
+                support@cryptovoicework.com
+              </a>
+            </div>
+
+            {/* Telegram Section */}
+            <div className="bg-sky-50 rounded-lg p-6 border border-sky-200">
+              <h3 className="font-semibold text-gray-900 mb-3">Join Our Community</h3>
+              <p className="text-sm text-gray-600 mb-4">Get the latest updates and connect with other users</p>
+              <button 
+                className="inline-flex items-center gap-2 px-4 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700 transition-colors font-medium text-sm"
+              >
+                Join Telegram Channel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
         </div>
       </div>
       )}

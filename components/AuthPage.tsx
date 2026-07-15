@@ -602,6 +602,18 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
             </p>
           </form>
         </div>
+        {/* Contact Footer */}
+        <div className="mt-8 pt-6 border-t border-gray-300">
+          <div className="text-center">
+            <p className="text-sm text-gray-600 mb-2">Need help? Contact us:</p>
+            <a 
+              href="mailto:support@cryptovoicework.com"
+              className="text-blue-600 hover:text-blue-700 font-semibold transition-colors"
+            >
+              support@cryptovoicework.com
+            </a>
+          </div>
+        </div>
       </div>
     );
   }
