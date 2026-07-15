@@ -29,6 +29,7 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
     setLoading(true);
 
     try {
+      console.log('[v0] Signup: sending request with email:', email);
       const response = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -36,14 +37,17 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
       });
 
       const data = await response.json();
+      console.log('[v0] Signup response:', { status: response.status, data });
 
       if (!response.ok) {
         setError(data.error || 'Signup failed');
         return;
       }
 
+      console.log('[v0] Signup success, calling onAuthSuccess');
       onAuthSuccess(email);
     } catch (err) {
+      console.error('[v0] Signup error:', err);
       setError('An error occurred. Please try again.');
     } finally {
       setLoading(false);
@@ -56,6 +60,7 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
     setLoading(true);
 
     try {
+      console.log('[v0] Login: sending request with email:', email);
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -63,14 +68,17 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
       });
 
       const data = await response.json();
+      console.log('[v0] Login response:', { status: response.status, data });
 
       if (!response.ok) {
         setError(data.error || 'Login failed');
         return;
       }
 
+      console.log('[v0] Login success, calling onAuthSuccess');
       onAuthSuccess(email);
     } catch (err) {
+      console.error('[v0] Login error:', err);
       setError('An error occurred. Please try again.');
     } finally {
       setLoading(false);
@@ -221,6 +229,7 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
             <div className="flex flex-col gap-3">
               <Button
                 onClick={() => {
+                  console.log('[v0] Changing mode to signup');
                   setMode('signup');
                   setError('');
                   setEmail('');
@@ -233,6 +242,7 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
               </Button>
               <Button
                 onClick={() => {
+                  console.log('[v0] Changing mode to login');
                   setMode('login');
                   setError('');
                   setEmail('');
