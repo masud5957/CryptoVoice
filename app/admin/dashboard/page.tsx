@@ -39,12 +39,14 @@ export default function AdminDashboard() {
   }, []);
 
   useEffect(() => {
-    if (tab === 'users') {
+    if (!authLoading && tab === 'users') {
+      console.log('[v0] Auth complete, fetching users');
       fetchAllUsers();
-    } else if (tab === 'withdrawals') {
+    } else if (!authLoading && tab === 'withdrawals') {
+      console.log('[v0] Auth complete, fetching withdrawals');
       fetchPendingWithdrawals();
     }
-  }, [tab]);
+  }, [tab, authLoading]);
 
   useEffect(() => {
     const filtered = searchEmail.trim()
@@ -74,31 +76,50 @@ export default function AdminDashboard() {
     setMessage('');
     try {
       const token = localStorage.getItem('adminToken');
+      console.log('[v0] fetchAllUsers: token:', token ? 'exists' : 'missing');
+      
       if (!token) {
+        console.log('[v0] fetchAllUsers: no token, redirecting');
         setMessage('Admin token expired. Please login again.');
         router.push('/admin/login');
         return;
       }
+      
+      console.log('[v0] fetchAllUsers: calling API');
       const response = await fetch('/api/admin/users/list', {
         headers: { 'X-Admin-Token': token },
       });
       
+      console.log('[v0] fetchAllUsers: response status:', response.status);
+      
       if (response.status === 401) {
+        console.log('[v0] fetchAllUsers: 401 response');
         setMessage('Authentication failed. Please login again.');
         router.push('/admin/login');
         return;
       }
 
       const data = await response.json();
-      if (data.success && data.users) {
+      console.log('[v0] fetchAllUsers: response data:', { success: data.success, userCount: data.users?.length, error: data.error });
+      
+      if (data.success && data.users && Array.isArray(data.users)) {
+        console.log('[v0] fetchAllUsers: setting users:', data.users.length);
         setUsers(data.users);
         setFilteredUsers(data.users);
+        setMessage('');
       } else {
-        setMessage(data.error || 'Failed to load users');
+        const errorMsg = data.error || 'Failed to load users - no data returned';
+        console.log('[v0] fetchAllUsers: error:', errorMsg);
+        setMessage(errorMsg);
+        setUsers([]);
+        setFilteredUsers([]);
       }
     } catch (error) {
-      console.error('[v0] Error fetching users:', error);
-      setMessage('Error loading users. Please try again.');
+      const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+      console.error('[v0] Error fetching users:', errorMsg);
+      setMessage(`Error loading users: ${errorMsg}`);
+      setUsers([]);
+      setFilteredUsers([]);
     } finally {
       setLoading(false);
     }
