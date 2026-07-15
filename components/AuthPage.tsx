@@ -204,7 +204,7 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
             <p className="text-gray-700 mb-2 text-lg leading-relaxed font-medium">
               Earn consistent profits with automated trading strategies. Multi-wallet support for Binance and Trust Wallet, real-time monitoring, and transparent operations.
             </p>
-            <p className="text-blue-600 mb-8 text-lg font-bold">Earn Commission Upto 5% Daily</p>
+            <p className="text-blue-600 mb-8 text-lg font-bold">Earn Commission Upto 3.5% Daily</p>
 
             {/* Features */}
             <div className="space-y-3 mb-12">
