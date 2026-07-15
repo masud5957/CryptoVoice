@@ -388,7 +388,7 @@ export function Dashboard({ onLogout }: DashboardProps) {
           <Plus className="w-5 h-5" />
           Add Crypto Wallet
         </button>
-        <p className="text-sm text-gray-600 mt-3">Connect your Binance, TrustWallet, or other crypto wallets</p>
+        <p className="text-sm text-gray-600 mt-3">Connect your Binance, TrustWallet, or other crypto wallets and earn daily upto 3% commission</p>
       </div>
 
       {/* Run Button */}
