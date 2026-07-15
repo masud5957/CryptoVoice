@@ -10,13 +10,15 @@ export default function AdminDashboard() {
   const [searchEmail, setSearchEmail] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [tab, setTab] = useState<'users' | 'balance'>('users');
+  const [tab, setTab] = useState<'users' | 'balance' | 'withdrawals'>('users');
   const [selectedUserId, setSelectedUserId] = useState('');
   const [selectedUserEmail, setSelectedUserEmail] = useState('');
   const [amount, setAmount] = useState('');
   const [reason, setReason] = useState('');
   const [message, setMessage] = useState('');
   const [addingBalance, setAddingBalance] = useState(false);
+  const [withdrawals, setWithdrawals] = useState<any[]>([]);
+  const [approvingId, setApprovingId] = useState<string | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem('adminToken');
@@ -27,7 +29,10 @@ export default function AdminDashboard() {
     }
     console.log('[v0] Token found, fetching users');
     fetchUsers();
-  }, [router]);
+    if (tab === 'withdrawals') {
+      fetchWithdrawals();
+    }
+  }, [router, tab]);
 
   const fetchUsers = async () => {
     try {
@@ -119,6 +124,51 @@ export default function AdminDashboard() {
     }
   };
 
+  const fetchWithdrawals = async () => {
+    try {
+      const token = localStorage.getItem('adminToken');
+      const response = await fetch('/api/admin/withdraw/pending', {
+        headers: { 'X-Admin-Token': token || '' },
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setWithdrawals(data.withdrawals || []);
+      }
+    } catch (err) {
+      console.error('[v0] Error fetching withdrawals:', err);
+    }
+  };
+
+  const handleApproveWithdrawal = async (withdrawalId: string) => {
+    try {
+      setApprovingId(withdrawalId);
+      const token = localStorage.getItem('adminToken');
+
+      const response = await fetch('/api/admin/withdraw/approve', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Admin-Token': token || '',
+        },
+        body: JSON.stringify({ withdrawalId }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setMessage('Withdrawal approved successfully');
+        fetchWithdrawals();
+      } else {
+        setMessage(data.error || 'Failed to approve withdrawal');
+      }
+    } catch (err) {
+      setMessage(`Error: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    } finally {
+      setApprovingId(null);
+    }
+  };
+
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
     router.push('/admin/login');
@@ -162,7 +212,7 @@ export default function AdminDashboard() {
         )}
 
         {/* Tabs */}
-        <div className="flex gap-4 mb-6">
+        <div className="flex gap-4 mb-6 flex-wrap">
           <button
             onClick={() => setTab('users')}
             className={`px-6 py-2 rounded-lg font-medium transition-colors ${
@@ -172,6 +222,16 @@ export default function AdminDashboard() {
             }`}
           >
             All Users
+          </button>
+          <button
+            onClick={() => setTab('withdrawals')}
+            className={`px-6 py-2 rounded-lg font-medium transition-colors ${
+              tab === 'withdrawals'
+                ? 'bg-blue-600 text-white'
+                : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+            }`}
+          >
+            Pending Withdrawals
           </button>
           <button
             onClick={() => setTab('balance')}
@@ -230,6 +290,50 @@ export default function AdminDashboard() {
                             className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-xs font-medium"
                           >
                             Add Balance
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Pending Withdrawals Tab */}
+        {tab === 'withdrawals' && (
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-6">Pending Withdrawals ({withdrawals.length})</h2>
+
+            {withdrawals.length === 0 ? (
+              <p className="text-center text-gray-500 py-8">No pending withdrawals</p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50 border-b">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">User ID</th>
+                      <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Amount</th>
+                      <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Address</th>
+                      <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Date</th>
+                      <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    {withdrawals.map((withdrawal) => (
+                      <tr key={withdrawal.id} className="hover:bg-gray-50">
+                        <td className="px-4 py-3 text-sm text-gray-900">{withdrawal.user_id}</td>
+                        <td className="px-4 py-3 text-sm font-medium text-gray-900">${(parseFloat(withdrawal.amount) || 0).toFixed(2)}</td>
+                        <td className="px-4 py-3 text-sm text-gray-600 font-mono text-xs">{withdrawal.withdrawal_address.substring(0, 10)}...</td>
+                        <td className="px-4 py-3 text-sm text-gray-600">{new Date(withdrawal.created_at).toLocaleDateString()}</td>
+                        <td className="px-4 py-3 text-sm">
+                          <button
+                            onClick={() => handleApproveWithdrawal(withdrawal.id)}
+                            disabled={approvingId === withdrawal.id}
+                            className="px-4 py-1 bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-gray-400 text-xs font-medium"
+                          >
+                            {approvingId === withdrawal.id ? 'Approving...' : 'Approve'}
                           </button>
                         </td>
                       </tr>
