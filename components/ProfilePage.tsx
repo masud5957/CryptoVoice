@@ -171,11 +171,11 @@ export function ProfilePage({ onBack }: ProfilePageProps) {
             </div>
 
             {/* Account Status */}
-            <div className="bg-green-50 rounded-lg p-4 border border-green-200">
+            <div className="bg-red-50 rounded-lg p-4 border border-red-200">
               <label className="text-sm font-semibold text-gray-700 block mb-2">Account Status</label>
               <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <p className="text-gray-900 font-medium">Active</p>
+                <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                <p className="text-gray-900 font-medium">Inactive</p>
               </div>
             </div>
           </div>
@@ -207,6 +207,54 @@ export function ProfilePage({ onBack }: ProfilePageProps) {
               </button>
             </div>
           </div>
+        </div>
+
+        {/* Security Deposit & Activation Section */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mt-6">
+          <h3 className="text-lg font-bold text-gray-900 mb-4">Security Deposit & Account Activation</h3>
+          
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+            <p className="text-sm text-yellow-900 mb-3">
+              <strong>⚠️ Account Status: INACTIVE</strong>
+            </p>
+            <p className="text-sm text-yellow-800">
+              To activate your account and start earning, you need to deposit a security amount. This ensures the security of your account and helps us prevent fraud.
+            </p>
+          </div>
+
+          <div className="space-y-3 mb-4">
+            <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+              <span className="text-blue-600 font-bold text-lg">1</span>
+              <div>
+                <p className="font-semibold text-gray-900 text-sm">Deposit Security Amount</p>
+                <p className="text-xs text-gray-600 mt-1">Send the required security deposit to your BEP20 wallet address to activate your account</p>
+              </div>
+            </div>
+            
+            <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+              <span className="text-blue-600 font-bold text-lg">2</span>
+              <div>
+                <p className="font-semibold text-gray-900 text-sm">Verification</p>
+                <p className="text-xs text-gray-600 mt-1">After deposit confirmation, your account will be verified automatically</p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+              <span className="text-blue-600 font-bold text-lg">3</span>
+              <div>
+                <p className="font-semibold text-gray-900 text-sm">Start Earning</p>
+                <p className="text-xs text-gray-600 mt-1">Once activated, you can connect wallets and start earning daily commissions</p>
+              </div>
+            </div>
+          </div>
+
+          <button className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors">
+            Deposit & Activate Account
+          </button>
+
+          <p className="text-xs text-gray-500 mt-4 text-center">
+            Your security deposit is fully refundable at any time if you decide to close your account
+          </p>
         </div>
 
         {/* Info Box */}
