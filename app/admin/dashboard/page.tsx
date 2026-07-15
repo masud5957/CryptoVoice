@@ -219,7 +219,7 @@ export default function AdminDashboard() {
                       <tr key={user.id} className="hover:bg-gray-50">
                         <td className="px-4 py-3 text-sm text-gray-900">{user.id}</td>
                         <td className="px-4 py-3 text-sm text-gray-600">{user.email}</td>
-                        <td className="px-4 py-3 text-sm font-medium text-gray-900">${(user.balance || 0).toFixed(2)}</td>
+                        <td className="px-4 py-3 text-sm font-medium text-gray-900">${(parseFloat(user.balance) || 0).toFixed(2)}</td>
                         <td className="px-4 py-3 text-sm">
                           <button
                             onClick={() => {
