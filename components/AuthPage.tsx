@@ -179,12 +179,6 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
         <div className="max-w-lg w-full">
           {/* Hero Section */}
           <div className="text-center mb-12">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl mb-6 shadow-lg">
-              <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm-5-9h10v2H7z" />
-              </svg>
-            </div>
-            
             {/* USDT Logo */}
             <div className="mb-6 flex justify-center">
               <Image 
