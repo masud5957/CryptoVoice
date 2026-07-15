@@ -388,7 +388,7 @@ export function Dashboard({ onLogout }: DashboardProps) {
           <Plus className="w-5 h-5" />
           Add Crypto Wallet
         </button>
-        <p className="text-sm text-gray-600 mt-3">Connect your Binance, TrustWallet, or other crypto wallets and earn daily upto 3% commission</p>
+        <p className="text-sm text-gray-600 mt-3">Connect your Binance, TrustWallet, or other crypto wallets and earn daily upto 3.5% commission</p>
         
         {/* Wallet Earning Instructions */}
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
@@ -411,7 +411,7 @@ export function Dashboard({ onLogout }: DashboardProps) {
               </li>
               <li className="flex items-start gap-2 text-xs text-gray-700">
                 <span className="text-blue-600 font-bold">•</span>
-                <span><strong>Earn 5% of daily transaction volume</strong> - Get commission based on platform trading activity</span>
+                <span><strong>Earn 3.5% of daily transaction volume</strong> - Get commission based on platform trading activity</span>
               </li>
             </ul>
             <div className="bg-white rounded p-3 mt-3 border border-blue-100">
