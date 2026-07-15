@@ -62,18 +62,34 @@ export default function AdminDashboard() {
 
   const fetchAllUsers = async () => {
     setLoading(true);
+    setMessage('');
     try {
       const token = localStorage.getItem('adminToken');
+      if (!token) {
+        setMessage('Admin token expired. Please login again.');
+        router.push('/admin/login');
+        return;
+      }
       const response = await fetch('/api/admin/users/list', {
-        headers: { 'X-Admin-Token': token || '' },
+        headers: { 'X-Admin-Token': token },
       });
+      
+      if (response.status === 401) {
+        setMessage('Authentication failed. Please login again.');
+        router.push('/admin/login');
+        return;
+      }
+
       const data = await response.json();
-      if (data.success) {
+      if (data.success && data.users) {
         setUsers(data.users);
         setFilteredUsers(data.users);
+      } else {
+        setMessage(data.error || 'Failed to load users');
       }
     } catch (error) {
-      console.error('Error fetching users:', error);
+      console.error('[v0] Error fetching users:', error);
+      setMessage('Error loading users. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -180,6 +196,12 @@ export default function AdminDashboard() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         {message && (
           <div className="mb-4 p-4 bg-green-50 border border-green-200 text-green-800 rounded-lg">
+            {message}
+          </div>
+        )}
+
+        {message && (
+          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
             {message}
           </div>
         )}
