@@ -27,6 +27,7 @@ export default function AdminDashboard() {
   const [searchEmail, setSearchEmail] = useState('');
   const [withdrawals, setWithdrawals] = useState<Withdrawal[]>([]);
   const [loading, setLoading] = useState(false);
+  const [authLoading, setAuthLoading] = useState(true);
   const [userId, setUserId] = useState('');
   const [userEmail, setUserEmail] = useState('');
   const [amount, setAmount] = useState('');
@@ -53,10 +54,18 @@ export default function AdminDashboard() {
   }, [searchEmail, users]);
 
   const checkAuth = async () => {
-    const token = localStorage.getItem('adminToken');
-    if (!token) {
+    try {
+      const token = localStorage.getItem('adminToken');
+      if (!token) {
+        console.log('[v0] No admin token found, redirecting to login');
+        router.push('/admin/login');
+        return;
+      }
+      console.log('[v0] Admin token found, allowing dashboard access');
+      setAuthLoading(false);
+    } catch (error) {
+      console.error('[v0] Auth check error:', error);
       router.push('/admin/login');
-      return;
     }
   };
 
@@ -172,6 +181,17 @@ export default function AdminDashboard() {
     localStorage.removeItem('adminToken');
     router.push('/admin/login');
   };
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading admin panel...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
