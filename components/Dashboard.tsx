@@ -226,21 +226,26 @@ export function Dashboard({ onLogout }: DashboardProps) {
             </div>
 
             {/* Right side - Profile Menu */}
-            <div className="relative">
-              <button
-                onClick={() => setShowProfileMenu(!showProfileMenu)}
-                className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center">
-                  <User className="w-4 h-4 text-amber-600" />
-                </div>
-                <span className="text-sm font-medium text-gray-700 hidden sm:inline">{user.name || user.email.split('@')[0]}</span>
-                <ChevronDown className="w-4 h-4 text-gray-500" />
-              </button>
+            <div className="flex items-center gap-4">
+              <div className="text-right hidden sm:block">
+                <p className="text-sm font-medium text-gray-900">Hi, {user.name || user.email.split('@')[0]}</p>
+                <p className="text-xs text-gray-500">{user.email}</p>
+              </div>
+              
+              <div className="relative">
+                <button
+                  onClick={() => setShowProfileMenu(!showProfileMenu)}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
+                >
+                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                    <User className="w-4 h-4 text-blue-600" />
+                  </div>
+                  <ChevronDown className="w-4 h-4 text-gray-500 hidden sm:inline" />
+                </button>
 
-              {/* Dropdown Menu */}
-              {showProfileMenu && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10">
+                {/* Dropdown Menu */}
+                {showProfileMenu && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10">
                   <div className="px-4 py-3 border-b border-gray-100">
                     {user.name && <p className="text-sm font-bold text-gray-900 mb-1">{user.name}</p>}
                     <p className="text-xs text-gray-500">{user.email}</p>
@@ -296,7 +301,8 @@ export function Dashboard({ onLogout }: DashboardProps) {
                     </button>
                   </div>
                 </div>
-              )}
+                )}
+              </div>
             </div>
           </div>
         </div>

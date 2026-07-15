@@ -1,11 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { ArrowLeft, Mail, Calendar, Copy, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Mail, Phone, Calendar, Copy, CheckCircle } from 'lucide-react';
 
 interface UserProfile {
   id: number;
   email: string;
+  name?: string;
+  phone?: string;
   balance: number;
   deposit_address: string;
   verified: boolean;
@@ -107,8 +109,9 @@ export function ProfilePage({ onBack }: ProfilePageProps) {
                 </span>
               </div>
               <div>
-                <h2 className="text-xl font-bold text-gray-900">{profile.email}</h2>
-                <p className="text-sm text-gray-500 flex items-center gap-1 mt-1">
+                {profile.name && <h2 className="text-xl font-bold text-gray-900">{profile.name}</h2>}
+                <p className="text-sm text-gray-600 mt-1">{profile.email}</p>
+                <p className="text-sm text-gray-500 flex items-center gap-1 mt-2">
                   {profile.verified ? (
                     <>
                       <CheckCircle className="w-4 h-4 text-green-600" />
@@ -123,6 +126,14 @@ export function ProfilePage({ onBack }: ProfilePageProps) {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Name Section */}
+            {profile.name && (
+              <div className="bg-gray-50 rounded-lg p-4">
+                <label className="text-sm font-semibold text-gray-700 block mb-2">Full Name</label>
+                <p className="text-gray-900 font-medium">{profile.name}</p>
+              </div>
+            )}
+            
             {/* Email Section */}
             <div className="bg-gray-50 rounded-lg p-4">
               <div className="flex items-center gap-2 mb-2">
@@ -132,6 +143,17 @@ export function ProfilePage({ onBack }: ProfilePageProps) {
               <p className="text-gray-900 font-mono text-sm break-all">{profile.email}</p>
             </div>
 
+            {/* Phone Section */}
+            {profile.phone && (
+              <div className="bg-gray-50 rounded-lg p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <Phone className="w-4 h-4 text-amber-600" />
+                  <label className="text-sm font-semibold text-gray-700">Phone Number</label>
+                </div>
+                <p className="text-gray-900 text-sm">{profile.phone}</p>
+              </div>
+            )}
+            
             {/* Account Created */}
             <div className="bg-gray-50 rounded-lg p-4">
               <div className="flex items-center gap-2 mb-2">
