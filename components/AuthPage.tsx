@@ -184,24 +184,51 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
               </svg>
             </div>
             <h1 className="text-5xl font-black text-gray-900 mb-3 tracking-tight">CryptoVoice</h1>
-            <p className="text-xl text-blue-600 mb-6 font-semibold">Smart Crypto Trading Platform</p>
-            <p className="text-gray-600 mb-8 text-lg leading-relaxed">
-              Earn consistent profits with automated trading strategies. Multi-wallet support, real-time monitoring, and transparent operations.
+            <p className="text-xl text-blue-600 mb-2 font-semibold">Automated Crypto Trading Platform</p>
+            <p className="text-sm text-gray-600 mb-6 font-medium">Connect Binance, Trust Wallet & More</p>
+            <p className="text-gray-700 mb-8 text-lg leading-relaxed font-medium">
+              Earn consistent profits with automated trading strategies. Multi-wallet support for Binance and Trust Wallet, real-time monitoring, and transparent operations.
             </p>
 
             {/* Features */}
             <div className="space-y-3 mb-12">
               <div className="flex items-center gap-3 text-gray-700">
                 <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0" />
-                <span className="text-sm font-medium">Daily profit distribution</span>
+                <span className="text-sm font-medium">Multi-wallet integration (Binance, Trust Wallet)</span>
               </div>
               <div className="flex items-center gap-3 text-gray-700">
                 <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0" />
-                <span className="text-sm font-medium">Secure wallet integration</span>
+                <span className="text-sm font-medium">Automated trading with real-time monitoring</span>
               </div>
               <div className="flex items-center gap-3 text-gray-700">
                 <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0" />
-                <span className="text-sm font-medium">Instant withdrawals anytime</span>
+                <span className="text-sm font-medium">Daily profit distribution & instant withdrawals</span>
+              </div>
+              <div className="flex items-center gap-3 text-gray-700">
+                <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0" />
+                <span className="text-sm font-medium">Transparent operations with audit trail</span>
+              </div>
+            </div>
+
+            {/* Additional Benefits */}
+            <div className="bg-blue-50 rounded-lg p-6 mb-8 border border-blue-100">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="text-left">
+                  <h4 className="font-semibold text-gray-900 mb-1">Binance Integration</h4>
+                  <p className="text-xs text-gray-600">Direct connection to Binance API for seamless trading</p>
+                </div>
+                <div className="text-left">
+                  <h4 className="font-semibold text-gray-900 mb-1">Trust Wallet Support</h4>
+                  <p className="text-xs text-gray-600">Secure wallet connectivity for decentralized trading</p>
+                </div>
+                <div className="text-left">
+                  <h4 className="font-semibold text-gray-900 mb-1">Real-Time Monitoring</h4>
+                  <p className="text-xs text-gray-600">24/7 automated trading strategies tracking</p>
+                </div>
+                <div className="text-left">
+                  <h4 className="font-semibold text-gray-900 mb-1">Profit Sharing</h4>
+                  <p className="text-xs text-gray-600">Daily profits distributed to your wallet automatically</p>
+                </div>
               </div>
             </div>
 
