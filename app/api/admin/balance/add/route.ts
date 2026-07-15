@@ -1,35 +1,49 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { addUserBalance } from '@/lib/deposit-service';
+import { pool } from '@/lib/db';
 
 export async function POST(request: NextRequest) {
   try {
     const token = request.headers.get('X-Admin-Token');
-    
     if (!token) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { userId, amount, reason } = await request.json();
+    const body = await request.json();
+    const { user_id, amount, reason } = body;
 
-    if (!userId || !amount) {
-      return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
+    if (!user_id || !amount) {
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    const result = await addUserBalance(
-      userId,
-      amount,
-      `Admin added balance: ${reason || 'Manual adjustment'}`
-    );
+    let client;
+    try {
+      client = await pool.connect();
 
-    if (!result.balanceUpdated) {
-      return NextResponse.json({ error: 'Failed to add balance' }, { status: 400 });
+      // Update user balance
+      await client.query(
+        `UPDATE users SET balance = balance + $1 WHERE id = $2`,
+        [parseFloat(amount), parseInt(user_id)]
+      );
+
+      // Log the transaction if reason provided
+      if (reason) {
+        console.log(`[v0] Admin added $${amount} to user ${user_id}: ${reason}`);
+      }
+
+      client.release();
+
+      return NextResponse.json({
+        success: true,
+        message: `Added $${amount} to user ${user_id}`,
+      });
+    } catch (error) {
+      if (client) client.release();
+      throw error;
     }
-
-    return NextResponse.json({
-      success: true,
-      newBalance: result.newBalance,
-    });
   } catch (error) {
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error('[v0] Error adding balance:', error);
+    return NextResponse.json({ 
+      error: error instanceof Error ? error.message : 'Internal server error'
+    }, { status: 500 });
   }
 }
