@@ -174,7 +174,7 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
   // Landing Page
   if (mode === 'landing') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 flex items-center justify-center px-4">
         <div className="max-w-lg w-full">
           {/* Hero Section */}
           <div className="text-center mb-12">
@@ -183,24 +183,24 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm-5-9h10v2H7z" />
               </svg>
             </div>
-            <h1 className="text-5xl font-black text-white mb-3 tracking-tight">CryptoVoice</h1>
-            <p className="text-xl text-blue-200 mb-6 font-semibold">Smart Crypto Trading Platform</p>
-            <p className="text-slate-400 mb-8 text-lg leading-relaxed">
+            <h1 className="text-5xl font-black text-gray-900 mb-3 tracking-tight">CryptoVoice</h1>
+            <p className="text-xl text-blue-600 mb-6 font-semibold">Smart Crypto Trading Platform</p>
+            <p className="text-gray-600 mb-8 text-lg leading-relaxed">
               Earn consistent profits with automated trading strategies. Multi-wallet support, real-time monitoring, and transparent operations.
             </p>
 
             {/* Features */}
             <div className="space-y-3 mb-12">
-              <div className="flex items-center gap-3 text-slate-300">
-                <CheckCircle className="w-5 h-5 text-blue-400 flex-shrink-0" />
+              <div className="flex items-center gap-3 text-gray-700">
+                <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0" />
                 <span className="text-sm font-medium">Daily profit distribution</span>
               </div>
-              <div className="flex items-center gap-3 text-slate-300">
-                <CheckCircle className="w-5 h-5 text-blue-400 flex-shrink-0" />
+              <div className="flex items-center gap-3 text-gray-700">
+                <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0" />
                 <span className="text-sm font-medium">Secure wallet integration</span>
               </div>
-              <div className="flex items-center gap-3 text-slate-300">
-                <CheckCircle className="w-5 h-5 text-blue-400 flex-shrink-0" />
+              <div className="flex items-center gap-3 text-gray-700">
+                <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0" />
                 <span className="text-sm font-medium">Instant withdrawals anytime</span>
               </div>
             </div>
@@ -225,8 +225,7 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
                   setError('');
                   setEmail('');
                 }}
-                variant="outline"
-                className="w-full border-2 border-blue-400 text-blue-300 hover:bg-blue-500/10 py-3 text-base font-bold rounded-xl transition-all duration-200"
+                className="w-full border-2 border-gray-300 text-gray-800 hover:bg-gray-100 bg-white py-3 text-base font-bold rounded-xl transition-all duration-200"
               >
                 Sign In
               </Button>
