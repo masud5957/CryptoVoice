@@ -389,6 +389,36 @@ export function Dashboard({ onLogout }: DashboardProps) {
           Add Crypto Wallet
         </button>
         <p className="text-sm text-gray-600 mt-3">Connect your Binance, TrustWallet, or other crypto wallets and earn daily upto 3% commission</p>
+        
+        {/* Wallet Earning Instructions */}
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
+          <div className="space-y-3">
+            <div>
+              <p className="text-xs font-semibold text-gray-900 mb-2">How Wallet Earning Works:</p>
+            </div>
+            <ul className="space-y-2">
+              <li className="flex items-start gap-2 text-xs text-gray-700">
+                <span className="text-blue-600 font-bold">•</span>
+                <span><strong>Wallet validity upto 30 days</strong> - Your connected wallet will be active for 30 days of earning</span>
+              </li>
+              <li className="flex items-start gap-2 text-xs text-gray-700">
+                <span className="text-blue-600 font-bold">•</span>
+                <span><strong>Daily commission in wallet</strong> - Receive your earnings automatically credited to your wallet daily</span>
+              </li>
+              <li className="flex items-start gap-2 text-xs text-gray-700">
+                <span className="text-blue-600 font-bold">•</span>
+                <span><strong>Withdraw anytime</strong> - No lock-in period, withdraw your earnings whenever you want</span>
+              </li>
+              <li className="flex items-start gap-2 text-xs text-gray-700">
+                <span className="text-blue-600 font-bold">•</span>
+                <span><strong>Earn 5% of daily transaction volume</strong> - Get commission based on platform trading activity</span>
+              </li>
+            </ul>
+            <div className="bg-white rounded p-3 mt-3 border border-blue-100">
+              <p className="text-xs text-gray-600"><strong>Company Daily Transaction Volume:</strong> 100,000 USDT</p>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Run Button */}
