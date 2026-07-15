@@ -253,6 +253,17 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
                 Sign In
               </Button>
             </div>
+
+            {/* Contact Footer */}
+            <div className="mt-8 pt-6 border-t border-gray-300">
+              <p className="text-sm text-gray-600 mb-2">Need help?</p>
+              <a 
+                href="mailto:support@cryptovoicework.com"
+                className="text-blue-600 hover:text-blue-700 font-semibold transition-colors"
+              >
+                support@cryptovoicework.com
+              </a>
+            </div>
           </div>
         </div>
       </div>
@@ -333,6 +344,17 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
                 Sign In
               </button>
             </p>
+
+            {/* Contact Footer */}
+            <div className="mt-6 pt-4 border-t border-gray-300">
+              <p className="text-xs text-gray-600 text-center mb-2">Need help?</p>
+              <a 
+                href="mailto:support@cryptovoicework.com"
+                className="text-sm text-blue-600 hover:text-blue-700 font-semibold transition-colors block text-center"
+              >
+                support@cryptovoicework.com
+              </a>
+            </div>
           </form>
         </div>
       </div>
@@ -405,6 +427,17 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
               >
                 Forgot Password?
               </button>
+            </div>
+
+            {/* Contact Footer */}
+            <div className="mt-6 pt-4 border-t border-gray-300">
+              <p className="text-xs text-gray-600 text-center mb-2">Need help?</p>
+              <a 
+                href="mailto:support@cryptovoicework.com"
+                className="text-sm text-blue-600 hover:text-blue-700 font-semibold transition-colors block text-center"
+              >
+                support@cryptovoicework.com
+              </a>
             </div>
           </form>
         </div>
@@ -480,6 +513,17 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
                 Sign In
               </button>
             </p>
+
+            {/* Contact Footer */}
+            <div className="mt-6 pt-4 border-t border-gray-300">
+              <p className="text-xs text-gray-600 text-center mb-2">Need help?</p>
+              <a 
+                href="mailto:support@cryptovoicework.com"
+                className="text-sm text-blue-600 hover:text-blue-700 font-semibold transition-colors block text-center"
+              >
+                support@cryptovoicework.com
+              </a>
+            </div>
           </form>
         </div>
       </div>
@@ -600,19 +644,18 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
                 Sign In
               </button>
             </p>
+
+            {/* Contact Footer */}
+            <div className="mt-6 pt-4 border-t border-gray-300">
+              <p className="text-xs text-gray-600 text-center mb-2">Need help?</p>
+              <a 
+                href="mailto:support@cryptovoicework.com"
+                className="text-sm text-blue-600 hover:text-blue-700 font-semibold transition-colors block text-center"
+              >
+                support@cryptovoicework.com
+              </a>
+            </div>
           </form>
-        </div>
-        {/* Contact Footer */}
-        <div className="mt-8 pt-6 border-t border-gray-300">
-          <div className="text-center">
-            <p className="text-sm text-gray-600 mb-2">Need help? Contact us:</p>
-            <a 
-              href="mailto:support@cryptovoicework.com"
-              className="text-blue-600 hover:text-blue-700 font-semibold transition-colors"
-            >
-              support@cryptovoicework.com
-            </a>
-          </div>
         </div>
       </div>
     );

@@ -16,9 +16,10 @@ interface UserProfile {
 
 interface ProfilePageProps {
   onBack: () => void;
+  onActivateClick?: () => void;
 }
 
-export function ProfilePage({ onBack }: ProfilePageProps) {
+export function ProfilePage({ onBack, onActivateClick }: ProfilePageProps) {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -248,7 +249,10 @@ export function ProfilePage({ onBack }: ProfilePageProps) {
             </div>
           </div>
 
-          <button className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors">
+          <button 
+            onClick={onActivateClick}
+            className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors"
+          >
             Deposit & Activate Account
           </button>
 

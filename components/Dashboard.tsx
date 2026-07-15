@@ -310,7 +310,17 @@ export function Dashboard({ onLogout }: DashboardProps) {
 
       {/* Main Content */}
       {currentView === 'profile' && (
-        <ProfilePage onBack={() => setCurrentView('main')} />
+        <ProfilePage 
+          onBack={() => setCurrentView('main')}
+          onActivateClick={() => {
+            setCurrentView('main');
+            setShowDepositPanel(true);
+            setTimeout(() => {
+              const depositSection = document.querySelector('[data-deposit-section]');
+              depositSection?.scrollIntoView({ behavior: 'smooth' });
+            }, 100);
+          }}
+        />
       )}
 
       {currentView === 'settings' && (
@@ -524,15 +534,17 @@ export function Dashboard({ onLogout }: DashboardProps) {
       </div>
 
       {/* Deposit Panel */}
-      {showDepositPanel && (
-        <DepositPanel
-          depositAddress={user.deposit_address}
+      <div data-deposit-section>
+        {showDepositPanel && (
+          <DepositPanel
+            depositAddress={user.deposit_address}
           onClose={() => {
             setShowDepositPanel(false);
             fetchDashboard();
           }}
         />
-      )}
+        )}
+      </div>
 
       {/* Add Wallet Modal */}
       {showAddWallet && (
